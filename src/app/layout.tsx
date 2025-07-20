@@ -5,7 +5,7 @@ import { I18nProvider } from "./i18n/i18n-context";
 import { detectLanguage } from "./i18n/server";
 import '@/app/globalProvider';
 export const metadata: Metadata = {
-  title: "RupeEcom Services",
+  title: "One Step Delivery",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {

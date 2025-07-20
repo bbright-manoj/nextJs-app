@@ -42,10 +42,10 @@ const API_BASE_URL = "https://1rpapp.in/v1";
 const DEV_API_BASE_URL = API_BASE_URL;
 const TENANT_SERVICE_URL = "https://tenantservice.1rpapp.in/v1";
 
-// Get tenantId from environment variables or config {etcnlzil,5e2f938f-5d53-4f33-bfd1-1248acec2fc7} {dxrhudtb,5b547df0-967d-4aa4-8996-e02511c66e26} {owuhhrlb, b0aec458-86f7-4c29-8587-ec4271b9168c}
-const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || "owuhhrlb";
+// Get tenantId from environment variables or config {dxrhudtb,5b547df0-967d-4aa4-8996-e02511c66e26} {owuhhrlb, b0aec458-86f7-4c29-8587-ec4271b9168c}
+const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || "etcnlzil";
 const appName = process.env.NEXT_PUBLIC_APP_NAME || "One Step Delivery";
-const storeId = "b0aec458-86f7-4c29-8587-ec4271b9168c";
+const storeId = "5e2f938f-5d53-4f33-bfd1-1248acec2fc7";
 
 export class APIService {
   private static instance: APIService;
@@ -897,6 +897,32 @@ export class APIService {
         notification: {
           title: errorMessage,
           body: "saveOrder",
+        },
+      });
+
+      throw new Error(errorMessage);
+    }
+  }
+
+  async saveContactInfo(data: any): Promise<void> {
+    try {
+      const payload = {
+        tenant_id: tenantId,
+        doc: data,
+      };
+
+      await this.post(`${DEV_API_BASE_URL}/save-user-enquiry`, payload);
+    } catch (error) {
+      let errorMessage = "Failed to save contact info";
+      if (axios.isAxiosError(error) && error.response) {
+        errorMessage = error.response.data.message || errorMessage;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      NotificationService.display({
+        notification: {
+          title: errorMessage,
+          body: "contactInfo",
         },
       });
 
