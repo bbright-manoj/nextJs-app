@@ -43,15 +43,18 @@ const NewProduct: React.FC = () => {
   }, []);
 
   // Group products into chunks of 3 for each slide
-  const chunkedProducts = recentProducts.reduce<Product[][]>((result, product, index) => {
-    const chunkIndex = Math.floor(index / 3);
-    if (!result[chunkIndex]) result[chunkIndex] = [];
-    result[chunkIndex].push(product);
-    return result;
-  }, []);
+  const chunkedProducts = recentProducts.reduce<Product[][]>(
+    (result, product, index) => {
+      const chunkIndex = Math.floor(index / 3);
+      if (!result[chunkIndex]) result[chunkIndex] = [];
+      result[chunkIndex].push(product);
+      return result;
+    },
+    []
+  );
 
   const handleProductClick = (id: number | string) => {
-    router.push(`/product-details/${id}`); 
+    router.push(`/product-details/${id}`);
   };
 
   return (
@@ -81,7 +84,12 @@ const NewProduct: React.FC = () => {
                         <i
                           key={i}
                           className={`fa fa-star ${
-                            i < (product.rating?.rating || 0) ? "" : "text-muted"
+                            i <
+                            (product.rating
+                              ? product.rating.calculateRating()
+                              : 0)
+                              ? "text-warning"
+                              : "fa-star-o text-warning"
                           }`}
                         ></i>
                       ))}

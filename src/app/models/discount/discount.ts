@@ -2,10 +2,10 @@ import { DiscountItem } from "../models";
 export class Discount {
   [x: string]: any;
   id: string;
-  name?: string;
+  name: string;
   details?: string;
   active?: boolean;
-  img?: string[];
+  img: string[];
   isDiscountPercent?: boolean;
   discountStartDate?: Date;
   excludeUsers?: string[];
@@ -31,10 +31,10 @@ export class Discount {
     discountItems,
   }: {
     id: string;
-    name?: string;
+    name: string;
     details?: string;
     active?: boolean;
-    img?: string[];
+    img: string[];
     isDiscountPercent?: boolean;
     discountStartDate?: Date;
     excludeUsers?: string[];
@@ -79,52 +79,61 @@ export class Discount {
 
   static fromMap(map: Record<string, any>): Discount {
     return new Discount({
-      id: map['id'],
-      name: map['name'],
-      details: map['details'],
-      active: map['active'],
-      img: map['img'] ? [...map['img']] : undefined,
-      discount: map['discount'],
-      discountEndDate: map['discount_end_date'] ? new Date(map['discount_end_date']) : undefined,
-      discountStartDate: map['discount_start_date'] ? new Date(map['discount_start_date']) : undefined,
-      isDiscountPercent: map['is_discount_percent'],
-      excludeUsers: map['exclude_users'] ? [...map['exclude_users']] : undefined,
-      creationTime: map['creation_time'],
-      itemSpecific: map['item_specific'],
-      discountItems: map['discount_items']
-        ? map['discount_items'].map((item: any) => DiscountItem.fromMap(item))
+      id: map["id"],
+      name: map["name"],
+      details: map["details"],
+      active: map["active"],
+      img: map["img"],
+      discount: map["discount"],
+      discountEndDate: map["discount_end_date"]
+        ? new Date(map["discount_end_date"])
+        : undefined,
+      discountStartDate: map["discount_start_date"]
+        ? new Date(map["discount_start_date"])
+        : undefined,
+      isDiscountPercent: map["is_discount_percent"],
+      excludeUsers: map["exclude_users"]
+        ? [...map["exclude_users"]]
+        : undefined,
+      creationTime: map["creation_time"],
+      itemSpecific: map["item_specific"],
+      discountItems: map["discount_items"]
+        ? map["discount_items"].map((item: any) => DiscountItem.fromMap(item))
         : undefined,
     });
   }
 
   static fromMapWithNoDiscountEndDate(map: Record<string, any>): Discount {
     return new Discount({
-      id: map['id'],
-      name: map['name'],
-      details: map['details'],
-      active: map['active'],
-      img: map['img'],
-      discount: map['discount'],
-      discountEndDate: map['discountEndDate'],
-      discountStartDate: map['discountStartDate'],
-      isDiscountPercent: map['isDiscountPercent'],
-      excludeUsers: map['excludeUsers'],
-      creationTime: map['creationTime'],
-      itemSpecific: map['itemSpecific'],
-      discountItems: map['discount_items'].map((item: any) => DiscountItem.fromMap(item)),
+      id: map["id"],
+      name: map["name"],
+      details: map["details"],
+      active: map["active"],
+      img: map["img"],
+      discount: map["discount"],
+      discountEndDate: map["discountEndDate"],
+      discountStartDate: map["discountStartDate"],
+      isDiscountPercent: map["isDiscountPercent"],
+      excludeUsers: map["excludeUsers"],
+      creationTime: map["creationTime"],
+      itemSpecific: map["itemSpecific"],
+      discountItems: map["discount_items"].map((item: any) =>
+        DiscountItem.fromMap(item)
+      ),
     });
   }
 
   getDiscountItems(): DiscountItem[] {
     return (
-      this.discountItems?.filter((item) => item.type === 'GOOD' || item.type === 'KIT') ?? []
+      this.discountItems?.filter(
+        (item) => item.type === "GOOD" || item.type === "KIT"
+      ) ?? []
     );
   }
 
   isDiscountExcludedToPhoneNumber(phoneNumber: string | null): boolean {
-    if(phoneNumber)
-    return this.excludeUsers?.includes(phoneNumber) ?? false;
-    else return false
+    if (phoneNumber) return this.excludeUsers?.includes(phoneNumber) ?? false;
+    else return false;
   }
 
   isDiscountActive(): boolean {

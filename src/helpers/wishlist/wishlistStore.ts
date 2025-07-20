@@ -6,10 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 
 // Product interface
 export interface WishlistProduct {
-  productId: string;
-  title: string;
+  productId?: string;
+  title?: string;
   img: string[];
-  price: number;
+  price?: number;
   stock?: number;
   variantId?: string;
   uuid?: string; // Add uuid to the interface
@@ -30,18 +30,20 @@ const createProductKey = (product: WishlistProduct): string => {
   if (product.uuid) {
     return product.uuid;
   }
-  
+
   // Create a more comprehensive key that includes multiple identifying factors
   const keyParts = [
-    product.productId || 'no-id',
-    product.variantId || 'no-variant',
-    product.title || 'no-title',
-    (product.price !== undefined && product.price !== null) ? product.price.toString() : 'no-price',
+    product.productId || "no-id",
+    product.variantId || "no-variant",
+    product.title || "no-title",
+    product.price !== undefined && product.price !== null
+      ? product.price.toString()
+      : "no-price",
     // Add any other distinguishing properties here
-    product.stock?.toString() || 'no-stock',
+    product.stock?.toString() || "no-stock",
     // You can add more fields like category, brand, etc.
   ];
-  return keyParts.join('|');
+  return keyParts.join("|");
 };
 
 export const useWishlistStore = create<WishlistStore>()(
@@ -51,13 +53,13 @@ export const useWishlistStore = create<WishlistStore>()(
 
       addToWish: (product) => {
         // Just handle undefined values gracefully without strict validation
-        if (!product || typeof product !== 'object') {
+        if (!product || typeof product !== "object") {
           toast.error("Invalid product data.");
           return;
         }
 
         const productKey = createProductKey(product);
-        
+
         const alreadyExists = get().wishlistItems.some(
           (item) => createProductKey(item) === productKey
         );
@@ -74,7 +76,7 @@ export const useWishlistStore = create<WishlistStore>()(
 
       removeFromWish: (product) => {
         const productKey = createProductKey(product);
-        
+
         const filtered = get().wishlistItems.filter(
           (item) => createProductKey(item) !== productKey
         );

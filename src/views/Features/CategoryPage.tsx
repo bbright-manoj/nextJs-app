@@ -17,7 +17,7 @@ const CategoryPage: React.FC = () => {
         <h4>category with text</h4>
       </div>
       <section className="box-category section-py-space">
-        <DiscountCoupon />
+        {/* <DiscountCoupon /> */}
       </section>
       {/* <!--title start--> */}
       <div className="title6">
