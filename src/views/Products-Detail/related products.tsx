@@ -7,7 +7,7 @@ import { Skeleton } from "../../common/skeleton";
 import { CartContext } from "../../helpers/cart/cart.context";
 import { WishlistContext } from "../../helpers/wishlist/wish.context";
 import { CompareContext } from "../../helpers/compare/compare.context";
-import { objCache, Product } from "@/app/globalProvider";
+import { appConfig, objCache, Product } from "@/app/globalProvider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import "swiper/css";
 import { Navigation, Pagination, Autoplay } from "swiper/modules";
@@ -17,7 +17,10 @@ interface RelatedProductsProps {
   hoverEffect?: string;
 }
 
-const RelatedProducts: NextPage<RelatedProductsProps> = ({ productId, categoryId }) => {
+const RelatedProducts: NextPage<RelatedProductsProps> = ({
+  productId,
+  categoryId,
+}) => {
   const { addToWish } = React.useContext(WishlistContext);
   const { addToCart } = React.useContext(CartContext);
   const { addToCompare } = React.useContext(CompareContext);
@@ -27,9 +30,16 @@ const RelatedProducts: NextPage<RelatedProductsProps> = ({ productId, categoryId
 
   useEffect(() => {
     const handleUpdateAllProducts = (data: Map<string, Product[]>) => {
-      const allProducts: Product[] = Array.from(new Map(Array.from(data.values()).flat().map((product) => [product.id, product])).values());
+      const allProducts: Product[] = Array.from(
+        new Map(
+          Array.from(data.values())
+            .flat()
+            .map((product) => [product.id, product])
+        ).values()
+      );
       const filtered = allProducts.filter(
-        (product) => product.categoryID === categoryId && product.id !== productId
+        (product) =>
+          product.categoryID === categoryId && product.id !== productId
       );
       setRelatedProducts(filtered);
     };
@@ -40,7 +50,6 @@ const RelatedProducts: NextPage<RelatedProductsProps> = ({ productId, categoryId
       objCache.off("updateAllProducts", handleUpdateAllProducts);
     };
   }, [categoryId, productId]);
-
 
   return (
     <section className="section-big-py-space ratio_asos ">
@@ -60,17 +69,7 @@ const RelatedProducts: NextPage<RelatedProductsProps> = ({ productId, categoryId
                   simulateTouch={true}
                   allowTouchMove={true}
                   navigation
-                  breakpoints={{
-                    0: {
-                      slidesPerView: 2,
-                    },
-                    768: {
-                      slidesPerView: 3,
-                    },
-                    1200: {
-                      slidesPerView: 6,
-                    },
-                  }}
+                  breakpoints={appConfig.mediaQueries}
                 >
                   {relatedProducts.slice().map((item, i) => (
                     <SwiperSlide key={i}>
@@ -78,13 +77,12 @@ const RelatedProducts: NextPage<RelatedProductsProps> = ({ productId, categoryId
                         <ProductBox
                           layout="layout-one"
                           data={item}
-                          newLabel={item.new}
                           item={item}
                           price={item.getPrice()}
                           addCart={() => addToCart(item)}
                           addCompare={() => addToCompare(item)}
                           addWish={() => addToWish(item)}
-                          hoverEffect={'icon-inline'}
+                          hoverEffect={"icon-inline"}
                         />
                       </div>
                     </SwiperSlide>

@@ -88,10 +88,10 @@ const LeftSidebarPage: NextPage<LeftSidebar> = ({ pathId }) => {
             >
               <Row>
                 {/* <Sidebar /> */}
-                <Col sm="12" lg="6" xs="12" xl="12">
+                <Col sm="6" lg="6" xs="12" xl="12">
                   <ProductService />
                 </Col>
-                <Col sm="12" lg="6" xs="12" xl="12">
+                <Col sm="6" lg="6" xs="12" xl="12">
                   <NewProduct />
                 </Col>
               </Row>

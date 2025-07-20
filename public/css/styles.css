@@ -18504,7 +18504,7 @@ li.with-megamenu:hover .rts-megamenu {
     display: none;
   }
   .layout-header2 .main-menu-block .cart-block {
-    margin: 20px 0 !important;
+    margin: 0px 20px !important;
   }
 }
 
@@ -18616,7 +18616,8 @@ li.with-megamenu:hover .rts-megamenu {
   font-weight: 700;
   color: #2c3c28;
   font-size: 14px;
-  margin-bottom: 8px;
+  margin-top: 8px;
+  margin-bottom: 0px !important;
   text-align: center;
 }
 
@@ -20331,6 +20332,7 @@ li.with-megamenu:hover .rts-megamenu {
   .collection-filter {
     position: unset !important;
     height: auto !important;
+    width: auto;
   }
 }
 

@@ -4,30 +4,41 @@ import { Row } from "reactstrap";
 import Layout1 from "@/views/layouts/layout1";
 import Collection from "@/views/Collections/Collection";
 import { useEffect, useState } from "react";
-import { Category, CategoryProducts, objCache, searchController } from "@/app/globalProvider";
+import {
+  Category,
+  CategoryProducts,
+  objCache,
+  searchController,
+} from "@/app/globalProvider";
 import { useSearchParams } from "next/navigation";
 import { FaSlidersH } from "react-icons/fa";
 import NewProduct from "@/views/Collections/NewProduct";
- 
+
 const NoSidebar: NextPage = () => {
   const searchParams = useSearchParams();
   const categoryId = searchParams.get("id");
   const categoryType = searchParams.get("type");
- 
+
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
   const [minPrice, setMinPrice] = useState<number>(0);
   const [maxPrice, setMaxPrice] = useState<number>(150);
   const [allCategories, setAllCategories] = useState<Category[]>([]);
-  const [selectedCatgeoryProducts, setselectedCatgeoryProducts] = useState<CategoryProducts[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<CategoryProducts[]>([]);
+  const [selectedCatgeoryProducts, setselectedCatgeoryProducts] = useState<
+    CategoryProducts[]
+  >([]);
+  const [filteredProducts, setFilteredProducts] = useState<CategoryProducts[]>(
+    []
+  );
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [hasInitialized, setHasInitialized] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
- 
-  const toggleMobileFilter = () => setIsMobileFilterOpen(prev => !prev);
- 
+
+  const toggleMobileFilter = () => setIsMobileFilterOpen((prev) => !prev);
+
   useEffect(() => {
-    const initialCategory = objCache.allCategories.find(cat => cat.id === categoryId);
+    const initialCategory = objCache.allCategories.find(
+      (cat) => cat.id === categoryId
+    );
     if (!hasInitialized) {
       setHasInitialized(true);
       if (initialCategory) {
@@ -38,7 +49,7 @@ const NoSidebar: NextPage = () => {
         updatePriceRangeFromFilteredProducts(products);
       }
     }
- 
+
     objCache.on("updateAllCategories", (data: Category[]) => {
       setAllCategories(data);
       setSelectedCategories((prevSelected) => {
@@ -53,55 +64,63 @@ const NoSidebar: NextPage = () => {
       });
     });
   }, []);
- 
+
   const handlePriceFilterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const filtered = selectedCatgeoryProducts.filter((prod:any) => {
+    const filtered = selectedCatgeoryProducts.filter((prod: any) => {
       const id = categoryType === "discount" ? prod.id : prod.productId;
       const price = searchController.getDetails(id, "getPrice");
-      return typeof price === "number" && price >= minPrice && price <= maxPrice;
+      return (
+        typeof price === "number" && price >= minPrice && price <= maxPrice
+      );
     });
     setFilteredProducts(filtered);
   };
- 
+
   const handleMinPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (!isNaN(val)) setMinPrice(val);
   };
- 
+
   const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (!isNaN(val)) setMaxPrice(val);
   };
- 
+
   const handleCategoryChange = (category: Category) => {
-    const updatedCategories = selectedCategories.find(cat => cat.id === category.id)
-      ? selectedCategories.filter(cat => cat.id !== category.id)
+    const updatedCategories = selectedCategories.find(
+      (cat) => cat.id === category.id
+    )
+      ? selectedCategories.filter((cat) => cat.id !== category.id)
       : [...selectedCategories, category];
- 
+
     setSelectedCategories(updatedCategories);
     const updatedProducts = getFilteredByCategoryProducts(updatedCategories);
     setselectedCatgeoryProducts(updatedProducts);
     setFilteredProducts(updatedProducts);
     updatePriceRangeFromFilteredProducts(updatedProducts);
   };
- 
-  const getFilteredByCategoryProducts = (catselected: Category[]): CategoryProducts[] => {
+
+  const getFilteredByCategoryProducts = (
+    catselected: Category[]
+  ): CategoryProducts[] => {
     const catProds: CategoryProducts[] = [];
-    catselected.forEach(cat => {
+    catselected.forEach((cat) => {
       catProds.push(...(cat.category_products || []));
     });
     return catProds;
   };
- 
-  const updatePriceRangeFromFilteredProducts = (products: CategoryProducts[]) => {
+
+  const updatePriceRangeFromFilteredProducts = (
+    products: CategoryProducts[]
+  ) => {
     const prices: number[] = products
-      .map((prod:any) => {
+      .map((prod: any) => {
         const id = categoryType === "discount" ? prod.id : prod.productId;
         return searchController.getDetails(id, "getPrice");
       })
       .filter((p): p is number => typeof p === "number" && !isNaN(p));
- 
+
     if (prices.length > 0) {
       setMinPrice(Math.min(...prices));
       setMaxPrice(Math.max(...prices));
@@ -110,17 +129,15 @@ const NoSidebar: NextPage = () => {
       setMaxPrice(150);
     }
   };
- 
+
   //const allBrands = ["Frito Lay", "Nespresso", "Oreo", "Quaker", "Welch's"];
- 
+
   const handleBrandChange = (brand: string) => {
-    setSelectedBrands(prev =>
-      prev.includes(brand)
-        ? prev.filter(b => b !== brand)
-        : [...prev, brand]
+    setSelectedBrands((prev) =>
+      prev.includes(brand) ? prev.filter((b) => b !== brand) : [...prev, brand]
     );
   };
- 
+
   const renderFilterSidebar = () => (
     <>
       {/* Price Filter */}
@@ -131,11 +148,23 @@ const NoSidebar: NextPage = () => {
             <div className="half-input-wrapper">
               <div className="single">
                 <label htmlFor="min">Min price</label>
-                <input id="min" type="number" value={minPrice} min={0} onChange={handleMinPriceChange} />
+                <input
+                  id="min"
+                  type="number"
+                  value={minPrice}
+                  min={0}
+                  onChange={handleMinPriceChange}
+                />
               </div>
               <div className="single">
                 <label htmlFor="max">Max price</label>
-                <input id="max" type="number" value={maxPrice} min={0} onChange={handleMaxPriceChange} />
+                <input
+                  id="max"
+                  type="number"
+                  value={maxPrice}
+                  min={0}
+                  onChange={handleMaxPriceChange}
+                />
               </div>
             </div>
             <input
@@ -147,13 +176,17 @@ const NoSidebar: NextPage = () => {
               onChange={(e) => setMaxPrice(parseInt(e.target.value, 10))}
             />
             <div className="filter-value-min-max">
-              <span>Price: ₹{minPrice} — ₹{maxPrice}</span>
-              <button type="submit" className="rts-btn btn-primary">Filter</button>
+              <span>
+                Price: ₹{minPrice} — ₹{maxPrice}
+              </span>
+              <button type="submit" className="rts-btn btn-primary">
+                Filter
+              </button>
             </div>
           </form>
         </div>
       </div>
- 
+
       {/* Categories */}
       <div className="single-filter-box">
         <h5 className="title">Product Categories</h5>
@@ -164,7 +197,9 @@ const NoSidebar: NextPage = () => {
                 <input
                   id={`cat${i + 1}`}
                   type="checkbox"
-                  checked={selectedCategories.some(item => cat.id === item.id)}
+                  checked={selectedCategories.some(
+                    (item) => cat.id === item.id
+                  )}
                   onChange={() => handleCategoryChange(cat)}
                 />
                 <label htmlFor={`cat${i + 1}`}>{cat.name}</label>
@@ -173,7 +208,7 @@ const NoSidebar: NextPage = () => {
           </div>
         </div>
       </div>
- 
+
       {/* Brands */}
       {/* <div className="single-filter-box">
         <h5 className="title">Select Brands</h5>
@@ -193,23 +228,23 @@ const NoSidebar: NextPage = () => {
           </div>
         </div>
       </div> */}
- 
+
       {/* New Products */}
       <div className="sidebar-new-product mt-4">
         <NewProduct />
       </div>
     </>
   );
- 
+
   return (
     <Layout1>
       {/* Mobile Filter Toggle */}
-      <div className="mobile-filter-toggle d-block d-lg-none">
+      <div className="mobile-filter-toggle d-block d-xl-none">
         <button className="btn btn-filter-icon" onClick={toggleMobileFilter}>
           <FaSlidersH className="me-2" /> Filter
         </button>
       </div>
- 
+
       <div className="shop-grid-sidebar-area rts-section-gap">
         <div className="container">
           <div className="row g-0">
@@ -234,7 +269,7 @@ const NoSidebar: NextPage = () => {
           </div>
         </div>
       </div>
- 
+
       {/* Mobile Sidebar */}
       <div
         className={`mobile-sidebar-overlay ${isMobileFilterOpen ? "open" : ""}`}
@@ -242,15 +277,14 @@ const NoSidebar: NextPage = () => {
       />
       <div className={`mobile-sidebar ${isMobileFilterOpen ? "open" : ""}`}>
         <div className="mobile-sidebar-header">
-          <button className="btn-close" onClick={toggleMobileFilter}>✖</button>
+          <button className="btn-close" onClick={toggleMobileFilter}>
+            ✖
+          </button>
         </div>
-        <div className="mobile-sidebar-content">
-          {renderFilterSidebar()}
-        </div>
+        <div className="mobile-sidebar-content">{renderFilterSidebar()}</div>
       </div>
     </Layout1>
   );
 };
- 
+
 export default NoSidebar;
- 
