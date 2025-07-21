@@ -2,12 +2,33 @@
 import React, { useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
-import { objCache, Product, appConfig } from "@/app/globalProvider";
+import {
+  objCache,
+  Product,
+  appConfig,
+  searchController,
+} from "@/app/globalProvider";
 import ProductBox from "../../layouts/widgets/Product-Box/productbox";
+import { WishlistContext } from "@/helpers/wishlist/wish.context";
+import { CartContext } from "@/helpers/cart/cart.context";
+import { CompareContext } from "@/helpers/compare/compare.context";
 
 const RecentlyAddedProducts: React.FC = () => {
   const [recentProducts, setRecentProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { addToWish } = React.useContext(WishlistContext);
+  const { addToCart } = React.useContext(CartContext);
+  const { addToCompare } = React.useContext(CompareContext);
+  // Function to handle adding item to cart with price included
+  const handleAddToCart = (item: any, qty = 1) => {
+    const price = searchController.getDetails(item.productId, "getPrice");
+    const cartItem = {
+      ...item,
+      price: price,
+      id: item.id,
+    };
+    addToCart(cartItem, qty);
+  };
 
   useEffect(() => {
     // Get recently added products
@@ -67,7 +88,7 @@ const RecentlyAddedProducts: React.FC = () => {
                 speed={2000}
                 autoplay={{
                   delay: 3000,
-                  disableOnInteraction: false,
+                  pauseOnMouseEnter: false,
                 }}
                 className="mySwiper-category-1 swiper-data"
                 breakpoints={appConfig.mediaQueries}
@@ -83,11 +104,9 @@ const RecentlyAddedProducts: React.FC = () => {
                       hoverEffect={"icon-inline"}
                       discount={product.discount?.discount || 0}
                       rating={product.rating?.calculateRating() || 0}
-                      addCart={() => console.log("Add to cart", product.id)}
-                      addWish={() => console.log("Add to wishlist", product.id)}
-                      addCompare={() =>
-                        console.log("Add to compare", product.id)
-                      }
+                      addCart={handleAddToCart}
+                      addCompare={() => addToCompare(product)}
+                      addWish={() => addToWish(product)}
                       data={product}
                     />
                   </SwiperSlide>

@@ -1,7 +1,7 @@
 "use client";
 import Breadcrumb from "@/views/Containers/Breadcrumb";
 import LeftSidebarPage from "@/views/Products-Detail/leftSidebarPage";
-import RelatedProducts from "@/views/Products-Detail/related products";
+import RelatedProducts from "@/views/Products-Detail/relatedproducts";
 import Layout1 from "@/views/layouts/layout1";
 import { NextPage } from "next";
 import { usePathname } from "next/navigation";

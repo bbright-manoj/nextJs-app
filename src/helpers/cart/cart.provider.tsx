@@ -29,31 +29,32 @@ export const CartProvider = (props: any) => {
 
   // Check if product is already in cart
   const isProductInCart = (productId: string): boolean => {
-    return cartItems.some((item) => 
-      item.id === productId || 
-      item.productId === productId ||
-      item.key === productId
+    return cartItems.some(
+      (item) =>
+        item.id === productId ||
+        item.productId === productId ||
+        item.key === productId
     );
   };
 
   // Get product quantity from cart
   const getProductQuantity = (productId: string): number => {
-    const item = cartItems.find((item) => 
-      item.id === productId || 
-      item.productId === productId ||
-      item.key === productId
+    const item = cartItems.find(
+      (item) =>
+        item.id === productId ||
+        item.productId === productId ||
+        item.key === productId
     );
     return item ? item.qty : 0;
   };
 
   // Find existing product in cart
   const findExistingProduct = (item: any) => {
-    return cartItems.find((cartItem) => 
-      cartItem.id === item.id || 
-      cartItem.productId === item.productId ||
-      cartItem.productId === item.id ||
-      cartItem.key === item.key ||
-      cartItem.key === item.id
+    return cartItems.find(
+      (cartItem) =>
+        //cartItem.id === item.id ||
+        cartItem.cartItemId === item.id
+      //cartItem.productId === item.id
     );
   };
 
@@ -63,29 +64,33 @@ export const CartProvider = (props: any) => {
   };
 
   const addToCart = (item: any, quantity: number = 1): boolean => {
+    console.log("Adding to cart:", item, "Quantity:", quantity);
     const existingProduct = findExistingProduct(item);
-    
+
     if (existingProduct) {
       // Product already exists, update quantity instead of adding new
       const newQuantity = existingProduct.qty + quantity;
       updateQty(existingProduct, newQuantity);
-      toast.success(`Product quantity updated! Now ${newQuantity} items in cart`);
+      toast.success(
+        `Product quantity updated! Now ${newQuantity} items in cart`
+      );
       return true;
     }
 
     // Product doesn't exist, add it to cart with specified quantity
-    toast.success(`${quantity} item(s) added to cart!`);
 
     const newItem: CartItem = {
       ...item,
       qty: quantity,
-      cartItemId: uuidv4(),
+      cartItemId: item.id,
       // Ensure we have a consistent identifier
-      productId: item.productId || item.id,
-      key: item.key || item.id,
+      id: item.id,
+      //key: item.key || item.id,
     };
 
     setCartItems((prev) => [...prev, newItem]);
+    console.log(cartItems, existingProduct);
+    toast.success(`${quantity} item(s) added to cart!`);
     return true;
   };
 
