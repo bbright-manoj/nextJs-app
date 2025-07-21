@@ -144,6 +144,16 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
         )} - ₹${activeRange.toLocaleString("en-IN")}`;
   };
 
+  const handleAddToCart = (item: any, qty = 1) => {
+    const price = searchController.getDetails(item.productId, "getPrice");
+    const cartItem = {
+      ...item,
+      price: price,
+      id: item.productId,
+    };
+    addToCart(cartItem, qty);
+  };
+
   useEffect(() => {
     fetchAllProducts();
   }, []);
@@ -177,7 +187,7 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
     return (
       <>
         {/* Price Range Selection */}
-        <section className="section-py-space rts-category-area">
+        <section className="rts-category-area">
           <div className="product-box">
             <Row>
               <Col className="pe-0">
@@ -193,7 +203,14 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
                     spaceBetween={15}
                     slidesPerView={6}
                     autoplay={true}
-                    breakpoints={appConfig.mediaQueries}
+                    breakpoints={{
+                      0: { slidesPerView: 1, spaceBetween: 10 },
+                      350: { slidesPerView: 2, spaceBetween: 10 },
+                      480: { slidesPerView: 3, spaceBetween: 12 },
+                      640: { slidesPerView: 4, spaceBetween: 15 },
+                      840: { slidesPerView: 5, spaceBetween: 15 },
+                      1140: { slidesPerView: 6, spaceBetween: 15 },
+                    }}
                     modules={[Navigation, Autoplay, Keyboard]}
                   >
                     {ranges.map((range, i) => {
@@ -241,15 +258,8 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
                       <Swiper
                         slidesPerView={6}
                         spaceBetween={30}
-                        autoplay={true}
-                        breakpoints={{
-                          0: { slidesPerView: 1, spaceBetween: 0 },
-                          320: { slidesPerView: 2, spaceBetween: 20 },
-                          480: { slidesPerView: 3, spaceBetween: 20 },
-                          640: { slidesPerView: 4, spaceBetween: 20 },
-                          840: { slidesPerView: 6, spaceBetween: 20 },
-                          1140: { slidesPerView: 6, spaceBetween: 20 },
-                        }}
+                        autoplay={{ delay: 1000, pauseOnMouseEnter: true }}
+                        breakpoints={appConfig.mediaQueries}
                         modules={[Autoplay, Navigation, Keyboard]}
                       >
                         {filteredProducts.map((product: any, i: number) => (
@@ -301,7 +311,7 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
                               item={product}
                               hoverEffect={"icon-inline"}
                               price={getPrice(product)}
-                              addCart={() => addToCart(product)}
+                              addCart={handleAddToCart}
                               addCompare={() => addToCompare(product)}
                               addWish={() => addToWish(product)}
                             />

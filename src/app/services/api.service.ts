@@ -36,16 +36,16 @@ import {
 import { useEffect } from "react";
 
 // Configuration
-const API_BASE_URL = "https://1rpapp.in/v1";
-//const API_BASE_URL = 'https://devqarupeecomservice.rupeecom.in/v1';
+const API_BASE_URL = appConfig.apiBaseUrl;
+//const API_BASE_URL = "https://devqarupeecomservice.rupeecom.in/v1";
 
 const DEV_API_BASE_URL = API_BASE_URL;
-const TENANT_SERVICE_URL = "https://tenantservice.1rpapp.in/v1";
+const TENANT_SERVICE_URL = appConfig.tenantServiceUrl;
 
-// Get tenantId from environment variables or config {dxrhudtb,5b547df0-967d-4aa4-8996-e02511c66e26} {owuhhrlb, b0aec458-86f7-4c29-8587-ec4271b9168c}
-const tenantId = process.env.NEXT_PUBLIC_TENANT_ID || "etcnlzil";
-const appName = process.env.NEXT_PUBLIC_APP_NAME || "One Step Delivery";
-const storeId = "5e2f938f-5d53-4f33-bfd1-1248acec2fc7";
+// Get tenantId from environment variables or config {etcnlzil, 5e2f938f-5d53-4f33-bfd1-1248acec2fc7} {dxrhudtb,5b547df0-967d-4aa4-8996-e02511c66e26} {owuhhrlb, b0aec458-86f7-4c29-8587-ec4271b9168c}
+const tenantId = appConfig.tenantId;
+const appName = appConfig.appName;
+const storeId = appConfig.defaultStoreId; // Default store ID if not set
 
 export class APIService {
   private static instance: APIService;

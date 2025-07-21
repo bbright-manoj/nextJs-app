@@ -51,19 +51,20 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
   const [activeTab, setActiveTab] = useState(0);
 
   const getPrice = (productId: string) => {
-    const price = searchController.getDetails(productId, "getProductPrice");
+    const price = searchController.getDetails(productId, "getPrice");
 
     return price;
   };
 
   // Function to handle adding item to cart with price included
-  const handleAddToCart = (item: any) => {
-    const price = getPrice(item.productId);
+  const handleAddToCart = (item: any, qty = 1) => {
+    const price = searchController.getDetails(item.productId, "getPrice");
     const cartItem = {
       ...item,
       price: price,
+      id: item.productId,
     };
-    addToCart(cartItem);
+    addToCart(cartItem, qty);
   };
 
   if (categories)
@@ -81,7 +82,7 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
                   speed={2000}
                   slidesPerView={7}
                   breakpoints={appConfig.mediaQueries}
-                  modules={[Mousewheel]}
+                  modules={[Mousewheel, Autoplay]}
                 >
                   {categories.map((c: any, i: any) => {
                     if (c.category_products.length)
@@ -105,7 +106,7 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
         </section>
 
         <section className="ratio_asos product">
-          <div className="custom-container">
+          <div className="container">
             <Row>
               <Col className="pe-0">
                 <TabContent activeTab={activeTab}>
@@ -120,15 +121,8 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
                           //   rows: 2,
                           // }}
                           loop={false}
-                          autoplay={true}
-                          breakpoints={{
-                            0: { slidesPerView: 1, spaceBetween: 0 },
-                            320: { slidesPerView: 2, spaceBetween: 20 },
-                            480: { slidesPerView: 3, spaceBetween: 20 },
-                            640: { slidesPerView: 4, spaceBetween: 20 },
-                            840: { slidesPerView: 5, spaceBetween: 20 },
-                            1140: { slidesPerView: 6, spaceBetween: 20 },
-                          }}
+                          autoplay={{ delay: 1000, pauseOnMouseEnter: true }}
+                          breakpoints={appConfig.mediaQueries}
                           modules={[Autoplay, Navigation, Keyboard]}
                         >
                           {categories[activeTab]?.category_products &&
@@ -141,7 +135,7 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
                                     hoverEffect={effect}
                                     data={item}
                                     newLabel={item.name}
-                                    addCart={() => handleAddToCart(item)}
+                                    addCart={handleAddToCart}
                                     addCompare={() => addToCompare(item)}
                                     addWish={() => addToWish(item)}
                                   />
