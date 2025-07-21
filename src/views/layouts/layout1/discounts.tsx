@@ -1,10 +1,10 @@
 
 "use client";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { useRouter } from "next/navigation";
 import { NextPage } from "next";
 import { Col, Row, Button } from "reactstrap";
-import { Discount, searchController } from "@/app/globalProvider";
+import { Discount, searchController, Product } from "@/app/globalProvider";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Autoplay } from "swiper/modules";
 import "swiper/css";
@@ -18,12 +18,13 @@ import { CurrencyContext } from "@/helpers/currency/CurrencyContext";
 
 interface Props {
   products?: Discount[];
+  item?: Product | Discount;
 }
 
-const DiscountProducts: NextPage<Props> = ({ products = [] }) => {
+const DiscountProducts: NextPage<Props> = ({ item, products = [] }) => {
   const router = useRouter();
-const { selectedCurr } = useContext(CurrencyContext);
-
+  const { selectedCurr } = useContext(CurrencyContext);
+  const { symbol, value } = selectedCurr;
   const { addToWish } = React.useContext(WishlistContext);
   const { addToCart } = React.useContext(CartContext);
   const { addToCompare } = React.useContext(CompareContext);
@@ -101,14 +102,14 @@ const { selectedCurr } = useContext(CurrencyContext);
                 </Col>
                 {/* right products */}
                 <Col xl="8" lg="8" className="discount-products-col">
-                  <Row>                    
-                    {(banner.discountItems ?? []).slice(0, 2).map((item: any, i: number) => (
+                  <Row>                  
+                    {(banner.discountItems ?? []).slice(0, 2).map((item: any, i: number) => (                      
                       <Col md="6" xs="6" key={i}>                        
-                        <div className="d-block d-lg-none">
+                        <div className="d-block d-sm-none">
                           <div className="product">
                           <ProductBox 
                             layout="layout-one" 
-                            price={item.getPrice(item.productId)} 
+                            price={item.id ? getPrice(item.id) : 0} 
                             hoverEffect={"icon-inline"} 
                             data={item} 
                             newLabel={item.name} 
@@ -117,7 +118,7 @@ const { selectedCurr } = useContext(CurrencyContext);
                             addWish={() => addToWish(item)} />
                           </div>
                         </div>
-                        <div className="d-none d-lg-block">                        
+                        <div className="d-none d-sm-block">                        
                           <div className="custom-product-card d-flex align-items-center p-3 mb-4 shadow-sm rounded bg-white border position-relative">
                             {/* discount badge */}
                               <div className="discount-badge">{item.discount}% Off</div>
@@ -131,36 +132,58 @@ const { selectedCurr } = useContext(CurrencyContext);
                               </div>
                             {/* product content */}
                             <div className="flex-grow-1">
-                              <h5 className="mb-1 fw-bold">{item.name}</h5>
-                              <div className="d-flex align-items-center mb-2">
-                                <span className="text-danger fs-5 fw-bold me-2">
-                                  ₹{item.getPrice(item.productId)}
+                              <h5 className="mb-1 fw-bold ms-2 mb-2">{item.name}</h5>
+                              <div className="d-flex align-items-center mb-2">                            
+                                <span className="text-muted ms-2 me-4 mb-3">
+                                  <del>
+                                    {symbol}
+                                    {(getPrice(item.id) * value).toFixed(2)}
+                                  </del>
+                                </span>                                                                                                 
+                                <span className=" text-success fw-bold mb-3">
+                                  {symbol}
+                                  {(getPrice(item.id) * value * (1 - item.discount / 100)).toFixed(2)}
                                 </span>
                               </div>
-                              <div className="d-flex align-items-center gap-2">
-                                <ul className="rating-star m-2 p-0">
-                                  <i className="fa fa-star text-warning"></i>
-                                  <i className="fa fa-star text-warning"></i>
-                                  <i className="fa fa-star text-warning"></i>
-                                  <i className="fa fa-star text-warning"></i>
-                                  <i className="fa fa-star-o text-warning"></i>
-                                </ul>
-                                <div className="quantity-input">
-                                  <input type="number" min="1" defaultValue="1" />
-                                </div>
-                                <Button
+                              <div className="d-flex align-items-center gap-2 ms-2 ">                                
+                                  <div className="rating-star">
+                                    {[...Array(5)].map((_, i) => (
+                                      <i
+                                        key={i}
+                                        className={`fa fa-star ${
+                                          i <
+                                          (item.rating
+                                            ? item.rating.calculateRating()
+                                            : 0)
+                                            ? "text-warning"
+                                            : "fa-star-o text-warning"
+                                        }`}
+                                      ></i>
+                                    ))}
+                                  </div>                                                      
+                                {/* <Button
                                   color="success"
                                   size="sm"
                                   onClick={() => addToCart(item)}
                                   className="add-to-cart-button"
                                 >
                                   <i className="fa fa-shopping-cart me-1"></i>
-                                  Add
-                                </Button>
+                                  Add to Cart */}                                  
+                                {/* </Button> */}
+                                <div className="product-buttons ">
+                                  <a                                
+                                    data-toggle="modal"
+                                    data-target="#addtocart "
+                                    className="btn btn-normal "
+                                    onClick={() => addToCart(item)}
+                                  >
+                                  add to cart
+                                  </a>
+                                </div>
                               </div>
                             </div>
                           </div>
-                        </div>                        
+                        </div>                                           
                       </Col>
                     ))}                    
                   </Row>

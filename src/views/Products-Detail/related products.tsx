@@ -64,7 +64,7 @@ const RelatedProducts: NextPage<RelatedProductsProps> = ({
                 <Swiper
                   spaceBetween={20}
                   modules={[Navigation, Pagination, Autoplay]}
-                  autoplay={{ delay: 1000, disableOnInteraction: true }}
+                  autoplay={{ delay: 1000, pauseOnMouseEnter: true }}
                   grabCursor={true}
                   simulateTouch={true}
                   allowTouchMove={true}
