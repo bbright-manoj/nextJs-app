@@ -5,7 +5,7 @@ import { NextPage } from "next";
 import { Media } from "reactstrap";
 import { useTranslation } from "react-i18next";
 import { MenuContext } from "@/helpers/menu/MenuContext";
-import {  Category, Category as ICategory, objCache } from "@/app/globalProvider";
+import { Category, Category as ICategory, objCache } from "@/app/globalProvider";
 import { centralDataCollector } from "@/app/services/central_data_control";
 import { useRouter } from "next/navigation";
 
@@ -19,16 +19,23 @@ const ByCategory: NextPage<ByCategoryProps> = ({ category }) => {
   const { leftMenu, setLeftMenu } = useContext(MenuContext);
   const [categories, setCategories] = useState<ICategory[]>([]);
   const router = useRouter();
-  useEffect(() => {
 
-     setCategories(objCache.allCategories);
+  useEffect(() => {
+    setCategories(objCache.allCategories);
     
-    objCache.on('updateAllCategories',(data: Category[]) => {
-          
-              setCategories(data);
-          
-            });
+    objCache.on('updateAllCategories', (data: Category[]) => {
+      setCategories(data);
+    });
   }, []);
+
+  const handleCategoryClick = (cat: ICategory) => {
+    // Close mobile menu
+    setLeftMenu(false);
+    document.body.style.overflow = "visible";
+    
+    // Navigate to the category page
+    router.push(`/collections/no-sidebar?id=${cat.id}&type=category`);
+  };
 
   return (
     <div className="nav-block" onClick={() => setShowState(!showState)}>
@@ -56,7 +63,8 @@ const ByCategory: NextPage<ByCategoryProps> = ({ category }) => {
         >
           <a
             href="#"
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               setLeftMenu(!leftMenu);
               document.body.style.overflow = "visible";
             }}
@@ -80,12 +88,16 @@ const ByCategory: NextPage<ByCategoryProps> = ({ category }) => {
             </li>
 
             {categories.map((cat) => (
-              <li key={cat.id} 
-                  onClick={() => router.push(`/collections/no-sidebar?id=${cat.id}&type=category`)}
+              <li 
+                key={cat.id} 
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent event bubbling
+                  handleCategoryClick(cat);
+                }}
                 style={{ cursor: "pointer" }}
               >                            
-                  <span className="arrow-before">&gt;</span>
-                  <span className="category-name">{cat.name}</span>                  
+                <span className="arrow-before">&gt;</span>
+                <span className="category-name">{cat.name}</span>                  
               </li>
             ))}
           </ul>
