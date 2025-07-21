@@ -70,7 +70,7 @@ const CollectionBanner: NextPage<Props> = ({
                 {categories.map((item) => (
                   <SwiperSlide key={item.id}>
                     <div
-                      className="single-category-one height-230"
+                      className="single-category-one height-250"
                       onClick={() =>
                         router.push(
                           `/collections/no-sidebar?id=${item.id}&type=category`

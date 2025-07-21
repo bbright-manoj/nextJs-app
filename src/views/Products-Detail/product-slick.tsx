@@ -41,7 +41,7 @@ const ProductSlick: React.FC<ProductSlickProps> = ({
       {" "}
       <section className="rts-product-details-section rts-product-details-section2 ">
         <div className="details-product-area w-full">
-          <Row>
+          <Row className="w-full">
             <Col lg="6">
               <div className="product-thumb-area">
                 <div className="thumb-wrapper one filterd-items figure">
