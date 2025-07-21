@@ -4,15 +4,17 @@ import { Col, Media, Row } from "reactstrap";
 import ProductDetail from "./product-detail";
 import { Discount, Product, searchController } from "@/app/globalProvider";
 
-
 interface ProductSlickProps {
   item: any;
   bundle: boolean;
   swatch: boolean;
 }
 
-const ProductSlick: React.FC<ProductSlickProps> = ({ item, bundle, swatch }) => {
-
+const ProductSlick: React.FC<ProductSlickProps> = ({
+  item,
+  bundle,
+  swatch,
+}) => {
   const [nav1, setNav1] = useState<Slider | null>();
   const [nav2, setNav2] = useState<Slider | null>();
 
@@ -35,29 +37,31 @@ const ProductSlick: React.FC<ProductSlickProps> = ({ item, bundle, swatch }) => 
   //const productPriceDetails:Product | Discount = searchController.getDetails(item.productId,'getProductById');
   //console.log(productPriceDetails)
   return (
-    <> <section className="rts-product-details-section rts-product-details-section2 ">
-      <div className="details-product-area">
-        <Row>
-          <Col lg="5">
-            <div className="product-thumb-area">
-              <div className="thumb-wrapper one filterd-items figure">
-                <div className="product-thumb">
-
-                  {item &&
-                    item.img.map((img: any, i: any) => {
-                      return (
-
-                        <Media src={`${img}`} alt="" className="img-fluid  image_zoom_cls-0" />
-
-                      );
-                    })}
-
+    <>
+      {" "}
+      <section className="rts-product-details-section rts-product-details-section2 ">
+        <div className="details-product-area w-full">
+          <Row>
+            <Col lg="6">
+              <div className="product-thumb-area">
+                <div className="thumb-wrapper one filterd-items figure">
+                  <div className="product-thumb">
+                    {item &&
+                      item.img.map((img: any, i: any) => {
+                        return (
+                          <Media
+                            src={`${img}`}
+                            alt=""
+                            className="img-fluid  image_zoom_cls-0"
+                          />
+                        );
+                      })}
+                  </div>
                 </div>
               </div>
-            </div>
-          </Col>
+            </Col>
 
-          {/* <Row>
+            {/* <Row>
           <Col>
             <Slider {...setting1} className="slider-nav" asNavFor={nav1!} ref={(slider2) => setNav2(slider2)} slidesToShow={item.img.length >= 3 ? 3 :item.img.length} >
               {item &&
@@ -71,13 +75,18 @@ const ProductSlick: React.FC<ProductSlickProps> = ({ item, bundle, swatch }) => 
             </Slider>
           </Col>
         </Row> */}
-          {/* </Col> */}
-          <Col lg="7" className="rtl-text">
-            <ProductDetail item={item} changeColorVar={changeColorVar} bundle={bundle} swatch={swatch} />
-          </Col>
-        </Row>
-      </div>
-    </section>
+            {/* </Col> */}
+            <Col lg="6" className="rtl-text">
+              <ProductDetail
+                item={item}
+                changeColorVar={changeColorVar}
+                bundle={bundle}
+                swatch={swatch}
+              />
+            </Col>
+          </Row>
+        </div>
+      </section>
     </>
   );
 };

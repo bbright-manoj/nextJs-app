@@ -17,7 +17,12 @@ interface ProductRightProps {
   swatch: boolean;
 }
 
-const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bundle, swatch }) => {
+const ProductDetail: React.FC<ProductRightProps> = ({
+  item,
+  changeColorVar,
+  bundle,
+  swatch,
+}) => {
   const [modal, setModal] = useState(false);
   const [qty, setQty] = useState(1);
   const [stock, setStock] = useState("InStock");
@@ -53,7 +58,7 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
       setStock("Out of Stock !");
     }
   };
-  
+
   const changeQty = (e: any) => {
     const newQty = parseInt(e.target.value);
     if (newQty >= 1 && !isNaN(newQty)) {
@@ -69,18 +74,18 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
-    
+
     // Check stock before adding
     if (item.stock && qty > item.stock) {
       setStock("Out of Stock !");
       return;
     }
-    
+
     // Add to cart with the selected quantity
     addToCart(item, qty);
   };
-  
-  // const { id } = router.query; 
+
+  // const { id } = router.query;
 
   const uniqueColor: any[] = [];
   const uniqueSize: any[] = [];
@@ -90,22 +95,29 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
         <span className="product-catagory">{item.categoryName}</span>
         <div className="d-flex align-items-center gap-2">
           <ul className="rating-star m-2 p-0">
-              <i className="fa fa-star text-warning"></i>
-              <i className="fa fa-star text-warning"></i>
-              <i className="fa fa-star text-warning"></i>
-              <i className="fa fa-star text-warning"></i>
-              <i className="fa fa-star-o text-warning"></i>
-            </ul>
-          </div>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star-o text-warning"></i>
+          </ul>
+        </div>
       </div>
       <h2>{item.name}</h2>
-      {item.discount ? <h4>
-        <del>
-          {symbol}
-          {item.getProductPrice() * value}
-        </del>
-        <span>{symbol}{item.getDiscountAmount()} off</span>
-      </h4> : ''}
+      {item.discount ? (
+        <h4>
+          <del>
+            {symbol}
+            {item.getProductPrice() * value}
+          </del>
+          <span>
+            {symbol}
+            {item.getDiscountAmount()} off
+          </span>
+        </h4>
+      ) : (
+        ""
+      )}
       <h3 className="product-price mb--15 d-block">
         {symbol}
         {(item.getPriceWithDiscount() * value).toFixed(2)}
@@ -117,7 +129,11 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
           var findItemSize = uniqueSize.find((x) => x === vari.size);
           if (!findItemSize && vari.size) uniqueSize.push(vari.size);
         })} */}
-      {swatch ? <ImageSwatch item={item} changeColorVar={changeColorVar} /> : ""}
+      {swatch ? (
+        <ImageSwatch item={item} changeColorVar={changeColorVar} />
+      ) : (
+        ""
+      )}
       {/* <div className="product-description border-product">
         <h6 className="product-title">select color</h6>
         {changeColorVar === undefined
@@ -176,38 +192,62 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
         )}
       </div> */}
       <div className="product-description border-product">
-        {stock !== "InStock" ? <span className="instock-cls">{stock}</span> : ""}
+        {stock !== "InStock" ? (
+          <span className="instock-cls">{stock}</span>
+        ) : (
+          ""
+        )}
         <h6 className="product-title">quantity</h6>
       </div>
       <div className="flex-block">
         <div className="qty-box contents">
           <div className="input-group">
             <span className="input-group-prepend">
-              <button type="button" className="btn quantity-left-minus" data-type="minus" data-field="" onClick={minusQty}>
+              <button
+                type="button"
+                className="btn quantity-left-minus"
+                data-type="minus"
+                data-field=""
+                onClick={minusQty}
+              >
                 <i className="ti-angle-left"></i>
               </button>
             </span>
-            <Input type="text" name="quantity" className="form-control input-number" value={qty} onChange={changeQty} />
+            <Input
+              type="text"
+              name="quantity"
+              className="form-control input-number"
+              value={qty}
+              onChange={changeQty}
+            />
             <span className="input-group-prepend">
-              <button type="button" className="btn quantity-right-plus" data-type="plus" data-field="" onClick={plusQty}>
+              <button
+                type="button"
+                className="btn quantity-right-plus"
+                data-type="plus"
+                data-field=""
+                onClick={plusQty}
+              >
                 <i className="ti-angle-right"></i>
               </button>
             </span>
           </div>
         </div>
-      </div>
-      <div className="product-buttons">
-        <a
-          href="#"
-          data-toggle="modal"
-          data-target="#addtocart"
-          className="btn btn-normal"
-          onClick={handleAddToCart}>
-          add to cart
-        </a>
-        <a href="/pages/account/checkout" className="btn btn-normal">
-          buy now
-        </a>
+
+        <div className="product-buttons">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#addtocart"
+            className="btn btn-normal"
+            onClick={handleAddToCart}
+          >
+            add to cart
+          </a>
+          <a href="/pages/account/checkout" className="btn btn-normal">
+            buy now
+          </a>
+        </div>
       </div>
       {/* <div className="border-product"> */}
       {/* <h6 className="product-title">product details</h6> */}
@@ -218,11 +258,29 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
       {/* </div> */}
       <div className="product-uniques">
         {/* <span className="sku product-unipue mb--10"><strong>SKU:</strong> BO1D0MX8SJ</span> */}
-        <span className="catagorys product-unipue mb--10"><strong>Categories:</strong></span>
-        <span className="tags product-unipue mb--10 "><strong>Tags:</strong>{item.tags.join(", ")}</span>
-        <span className="tags product-unipue mb--10"><strong>LIFE:</strong> 6 Months</span>
-        <span className="tags product-unipue mb--10"><strong>Type:</strong> original</span>
-        <span className="tags product-unipue mb--10"><strong>BrandName:</strong>{item.brandName}</span>
+        {/* <span className="catagorys product-unipue mb--10">
+          <strong>Categories:</strong>
+        </span> */}
+        {item.tags.length ? (
+          <span className="tags product-unipue mb--10 ">
+            <strong>Tags:</strong>
+            {item.tags.join(", ")}
+          </span>
+        ) : (
+          ""
+        )}
+        <span className="tags product-unipue mb--10">
+          <strong>LIFE:</strong> 6 Months
+        </span>
+        <span className="tags product-unipue mb--10">
+          <strong>Type:</strong> original
+        </span>
+        {item.brandName ?? (
+          <span className="tags product-unipue mb--10">
+            <strong>BrandName:</strong>
+            {item.brandName}
+          </span>
+        )}
       </div>
       <div className="border-product">
         <div className="product-icon">
@@ -258,7 +316,8 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
               className="wishlist-btn"
               onClick={() => {
                 addToWish(item);
-              }}>
+              }}
+            >
               <i className="fa fa-heart"></i>
               <span className="title-font">Add To WishList</span>
             </button>

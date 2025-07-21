@@ -5,6 +5,7 @@ import {
   Kit,
   Product,
   StorePriceRanges,
+  appConfig,
   objCache,
   searchController,
 } from "@/app/globalProvider";
@@ -59,13 +60,13 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
       // Get products from search controller
       if (searchController?.getAllProducts) {
         const searchResults = searchController.getAllProducts();
-        if (searchResults instanceof Map) {
-          for (const products of searchResults.values()) {
-            if (Array.isArray(products)) fetchedProducts.push(...products);
-          }
-        } else if (Array.isArray(searchResults)) {
-          fetchedProducts = searchResults;
-        }
+        // if (searchResults instanceof Map) {
+        //   for (const products of searchResults.values()) {
+        //     if (Array.isArray(products)) fetchedProducts.push(...products);
+        //   }
+        // } else if (Array.isArray(searchResults)) {
+        //   fetchedProducts = searchResults;
+        // }
       }
 
       // Get products from cache
@@ -192,14 +193,7 @@ const PriceRanges: NextPage<Props> = ({ priceRanges }) => {
                     spaceBetween={15}
                     slidesPerView={6}
                     autoplay={true}
-                    breakpoints={{
-                      0: { slidesPerView: 1, spaceBetween: 10 },
-                      350: { slidesPerView: 2, spaceBetween: 10 },
-                      480: { slidesPerView: 3, spaceBetween: 12 },
-                      640: { slidesPerView: 4, spaceBetween: 15 },
-                      840: { slidesPerView: 5, spaceBetween: 15 },
-                      1140: { slidesPerView: 6, spaceBetween: 15 },
-                    }}
+                    breakpoints={appConfig.mediaQueries}
                     modules={[Navigation, Autoplay, Keyboard]}
                   >
                     {ranges.map((range, i) => {
