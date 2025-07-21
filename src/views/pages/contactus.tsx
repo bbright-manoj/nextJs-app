@@ -1,11 +1,12 @@
 "use client";
 import { NextPage } from "next";
 import React, { useEffect, useState } from "react";
-import { Row, Col } from "reactstrap";
+import { Input, Label, Row, Col, Form, FormGroup } from "reactstrap";
 import Breadcrumb from "../Containers/Breadcrumb";
 import { API } from "../../app/services/api.service";
 import { BusinessDetails, LatLng } from "@/app/globalProvider";
 import { useRouter } from "next/navigation";
+import { toast } from "react-toastify";
 
 const ContactUsPage: NextPage = () => {
   const [details, setDetails] = useState<BusinessDetails | null>(null);
@@ -14,39 +15,25 @@ const ContactUsPage: NextPage = () => {
 
   const router = useRouter();
 
+  const [data, setData] = useState({
+    name: "",
+    phone_number: "",
+    message: "",
+  });
   useEffect(() => {
     const fetchBusinessDetailsAndLocation = async () => {
       try {
         const data = await API.getBusinessDetails();
         setDetails(data);
 
-        // Replace this with actual delivery location (dummy values shown here)
-        const deliveryLocation = {
-          latitude: 12.9716,
-          longitude: 77.5946,
-        };
-
         const storeLocation = {
-          latitude: 0,
-          longitude: 0,
+          latitude: 17.1205268,
+          longitude: 81.2983022,
         };
-      console.log("storeLocation:", storeLocation);
-      console.log("deliveryLocation:", deliveryLocation);
-
-      const result = await API.getDistanceFromOlaMaps(storeLocation, deliveryLocation);
-
-        // Parse the store location from Ola Maps API response
-        if (result?.origin) {
-          const [latStr, lngStr] = result.origin.split(",");
-          const lat = parseFloat(latStr);
-          const lng = parseFloat(lngStr);
-
-        // ✅ Console logs
-          console.log("Store Latitude:", lat);
-          console.log("Store Longitude:", lng);
-
-          setStoreCoords({ lat, lng });
-        }
+        setStoreCoords({
+          lat: storeLocation.latitude,
+          lng: storeLocation.longitude,
+        });
       } catch (error) {
         console.error("Error loading data:", error);
       } finally {
@@ -59,6 +46,31 @@ const ContactUsPage: NextPage = () => {
 
   const openInstagram = (url: string) => {
     router.push(url);
+  };
+  const handleInputChange = (field: string, value: string) => {
+    setData((prev: any) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  // Save profile data
+  const handleSaveContact = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    setTimeout(() => {
+      try {
+        API.saveContactInfo(data);
+        setData({
+          name: "",
+          phone_number: "",
+          message: "",
+        });
+        toast.success("Contact information saved successfully!");
+      } catch (error) {
+        console.error("Error saving profile:", error);
+      }
+    }, 1000);
   };
 
   return (
@@ -100,7 +112,10 @@ const ContactUsPage: NextPage = () => {
                         <strong>Instagram:</strong>{" "}
                         <p
                           className="text-primary mb-0"
-                          style={{ cursor: "pointer", textDecoration: "underline" }}
+                          style={{
+                            cursor: "pointer",
+                            textDecoration: "underline",
+                          }}
                           onClick={() => openInstagram(details.instagram!)}
                         >
                           {details.instagram}
@@ -110,23 +125,86 @@ const ContactUsPage: NextPage = () => {
                   </div>
                 )}
               </div>
+              <div className="theme-card mt--30">
+                {storeCoords ? (
+                  <iframe
+                    src={`https://www.google.com/maps?q=${storeCoords.lat},${storeCoords.lng}&z=15&output=embed`}
+                    allowFullScreen
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    style={{ width: "100%", height: "400px", border: 0 }}
+                  />
+                ) : (
+                  <p>Loading map...</p>
+                )}
+              </div>
             </Col>
 
-            <Col xl="6" className="map">
-              <div className="theme-card">
-                {/* {storeCoords ? ( */}
-                  <iframe
-                    // src={`https://www.google.com/maps?q=${storeCoords.lat},${storeCoords.lng}&z=15&output=embed`}
-                    src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d1605.811957341231!2d25.45976406005396!3d36.3940974010114!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sin!4v1550912388321"
-                    allowFullScreen
-                    // loading="lazy"
-                    // referrerPolicy="no-referrer-when-downgrade"
-                    // style={{ width: "100%", height: "400px", border: 0 }}
-                  ></iframe>
-                {/* ) : ( */}
-                  {/* <p>Loading map...</p> */}
-                {/* )} */}
-              </div>
+            <Col xl="6">
+              <Form className="theme-form" onSubmit={handleSaveContact}>
+                <div className="form-row row">
+                  <Col md="6">
+                    <FormGroup>
+                      <Label htmlFor="name">Name</Label>
+                      <Input
+                        type="text"
+                        className="form-control"
+                        id="name"
+                        placeholder="Enter Your name"
+                        value={data.name}
+                        onChange={(e: { target: { value: string } }) =>
+                          handleInputChange("name", e.target.value)
+                        }
+                        required
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col md="6">
+                    <FormGroup>
+                      <Label htmlFor="phone_number">Phone number</Label>
+                      <Input
+                        type="tel"
+                        className="form-control"
+                        id="phone_number"
+                        placeholder="Enter your number"
+                        value={data.phone_number}
+                        onChange={(e: { target: { value: string } }) =>
+                          handleInputChange("phone_number", e.target.value)
+                        }
+                        required
+                      />
+                    </FormGroup>
+                  </Col>
+
+                  <Col className="col-md-12">
+                    <FormGroup>
+                      <Label htmlFor="message">Message</Label>
+                      <textarea
+                        className="form-control mb-0"
+                        placeholder="Write Your Message"
+                        id="message"
+                        value={data.message}
+                        onChange={(e) =>
+                          handleInputChange("message", e.target.value)
+                        }
+                        rows={4}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col md="12">
+                    <div className="d-flex gap-2">
+                      <button
+                        className="btn btn-sm btn-normal mb-lg-5"
+                        type="submit"
+                        onClick={handleSaveContact}
+                      >
+                        Submit
+                      </button>
+                    </div>
+                  </Col>
+                </div>
+              </Form>
             </Col>
           </Row>
         </div>
@@ -136,3 +214,6 @@ const ContactUsPage: NextPage = () => {
 };
 
 export default ContactUsPage;
+function setData(arg0: (prev: any) => any) {
+  throw new Error("Function not implemented.");
+}

@@ -13,11 +13,7 @@
         "title": "cart",
         "type": "link"
       },
-      {
-        "path": "/pages/account/dashboard",
-        "title": "dashboard",
-        "type": "link"
-      },
+
       {
         "path": "/pages/account/login",
         "title": "login",
