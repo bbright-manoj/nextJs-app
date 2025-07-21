@@ -11,27 +11,21 @@ const DynamicFavicon = () => {
         const logo = res?.appLogo;
 
         if (logo) {
-          // Remove existing favicons
+          // Safely remove existing favicon links
           const existingIcons = document.querySelectorAll("link[rel*='icon']");
-          existingIcons.forEach((el) => el.parentNode?.removeChild(el));
-
-          const sizes = ["16x16", "32x32", "48x48", "64x64"];
-
-          sizes.forEach((size) => {
-            const link: HTMLLinkElement = document.createElement("link");
-            link.type = "image/png";
-            link.rel = "icon";
-            link.href = logo;
-            link.sizes = size;
-            document.head.appendChild(link);
+          existingIcons.forEach((el) => {
+            if (el && el.parentNode && document.contains(el)) {
+              el.parentNode.removeChild(el);
+            }
           });
 
-          // Optionally set default favicon for browsers that ignore sizes
-          const defaultLink: HTMLLinkElement = document.createElement("link");
-          defaultLink.type = "image/png";
-          defaultLink.rel = "icon";
-          defaultLink.href = logo;
-          document.head.appendChild(defaultLink);
+          // Add a single 32x32 favicon
+          const link: HTMLLinkElement = document.createElement("link");
+          link.type = "image/png";
+          link.rel = "icon";
+          link.href = logo;
+          link.sizes = "32x32";
+          document.head.appendChild(link);
         } else {
           console.warn("Logo not found in response", res);
         }
@@ -43,7 +37,7 @@ const DynamicFavicon = () => {
     fetchLogo();
   }, []);
 
-  return null;
+  return <></>;
 };
 
 export default DynamicFavicon;
