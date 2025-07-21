@@ -106,7 +106,7 @@ const ProductBox: NextPage<productType> = ({
             <button
               onClick={(e) => {
                 e.stopPropagation();
-                addCart();
+                addCart(data);
               }}
             >
               <i className="ti-bag"></i>
@@ -278,7 +278,10 @@ const ProductBox: NextPage<productType> = ({
                   <a
                     href="#"
                     className="btn btn-normal"
-                    onClick={() => addCart()}
+                    onClick={() => {
+                      addCart(data, quantity);
+                      setModal(!modal);
+                    }}
                   >
                     add to cart
                   </a>
