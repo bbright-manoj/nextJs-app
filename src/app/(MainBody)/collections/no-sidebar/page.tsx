@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { Row } from "reactstrap";
 import Layout1 from "@/views/layouts/layout1";
 import Collection from "@/views/Collections/Collection";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import {
   Category,
   CategoryProducts,
@@ -30,40 +30,132 @@ const NoSidebar: NextPage = () => {
     []
   );
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
-  const [hasInitialized, setHasInitialized] = useState(false);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Add refs to track if data has been loaded to prevent unnecessary reloads
+  const isInitialLoadDone = useRef(false);
+  const currentCategoryId = useRef<string | null>(null);
 
   const toggleMobileFilter = () => setIsMobileFilterOpen((prev) => !prev);
 
-  useEffect(() => {
-    const initialCategory = objCache.allCategories.find(
-      (cat) => cat.id === categoryId
-    );
-    if (!hasInitialized) {
-      setHasInitialized(true);
-      if (initialCategory) {
-        setSelectedCategories([initialCategory]);
-        const products = initialCategory.category_products || [];
-        setselectedCatgeoryProducts(products);
-        setFilteredProducts(products);
-        updatePriceRangeFromFilteredProducts(products);
-      }
+  // Function to update price range from products
+  const updatePriceRangeFromFilteredProducts = useCallback((
+    products: CategoryProducts[]
+  ) => {
+    const prices: number[] = products
+      .map((prod: any) => {
+        const id = categoryType === "discount" ? prod.id : prod.productId;
+        return searchController.getDetails(id, "getPrice");
+      })
+      .filter((p): p is number => typeof p === "number" && !isNaN(p));
+
+    if (prices.length > 0) {
+      setMinPrice(Math.min(...prices));
+      setMaxPrice(Math.max(...prices));
+    } else {
+      setMinPrice(0);
+      setMaxPrice(150);
+    }
+  }, [categoryType]);
+
+  // Function to load category data based on current URL parameters
+  const loadCategoryData = useCallback(() => {
+    console.log('Loading category data for:', categoryId, categoryType);
+    
+    if (!categoryId) {
+      setSelectedCategories([]);
+      setselectedCatgeoryProducts([]);
+      setFilteredProducts([]);
+      setMinPrice(0);
+      setMaxPrice(150);
+      setIsLoading(false);
+      currentCategoryId.current = null;
+      return;
     }
 
-    objCache.on("updateAllCategories", (data: Category[]) => {
+    // Get the latest categories from objCache
+    const currentCategories = objCache.allCategories || [];
+    console.log('Available categories:', currentCategories.map(c => ({ id: c.id, name: c.name })));
+    
+    const targetCategory = currentCategories.find(cat => cat.id === categoryId);
+    console.log('Found target category:', targetCategory?.name, targetCategory?.id);
+
+    if (targetCategory) {
+      setSelectedCategories([targetCategory]);
+      const products = targetCategory.category_products || [];
+      console.log('Category products:', products.length);
+      
+      setselectedCatgeoryProducts(products);
+      setFilteredProducts(products);
+      updatePriceRangeFromFilteredProducts(products);
+      currentCategoryId.current = categoryId;
+    } else {
+      console.log('Category not found, clearing data');
+      setSelectedCategories([]);
+      setselectedCatgeoryProducts([]);
+      setFilteredProducts([]);
+      setMinPrice(0);
+      setMaxPrice(150);
+      currentCategoryId.current = null;
+    }
+    
+    setIsLoading(false);
+    isInitialLoadDone.current = true;
+  }, [categoryId, categoryType, updatePriceRangeFromFilteredProducts]);
+
+  // Initial setup and objCache listener
+  useEffect(() => {
+    console.log('Setting up objCache listener');
+    
+    // Set initial categories
+    setAllCategories(objCache.allCategories || []);
+    
+    // Load initial data only if not already loaded
+    if (!isInitialLoadDone.current) {
+      loadCategoryData();
+    }
+
+    // Listen for category updates - but don't reload if we're already showing a category
+    const handleCategoriesUpdate = (data: Category[]) => {
+      console.log('Categories updated:', data.length);
       setAllCategories(data);
-      setSelectedCategories((prevSelected) => {
-        const updatedSelected = prevSelected
-          .map((prevCat) => data.find((newCat) => newCat.id === prevCat.id))
-          .filter((cat): cat is Category => !!cat);
-        const combinedProducts = getFilteredByCategoryProducts(updatedSelected);
-        setselectedCatgeoryProducts(combinedProducts);
-        setFilteredProducts(combinedProducts);
-        updatePriceRangeFromFilteredProducts(combinedProducts);
-        return updatedSelected;
-      });
-    });
-  }, []);
+      
+      // Only reload if we don't have a current category selected or if the categories were empty before
+      if (!currentCategoryId.current || allCategories.length === 0) {
+        setTimeout(() => loadCategoryData(), 100);
+      } else {
+        // Just update the categories list without reloading the current selection
+        console.log('Categories updated but maintaining current selection');
+      }
+    };
+
+    objCache.on('updateAllCategories', handleCategoriesUpdate);
+
+    // Cleanup
+    return () => {
+      // If objCache has an off method, use it
+      if (objCache.off) {
+        objCache.off('updateAllCategories', handleCategoriesUpdate);
+      }
+    };
+  }, []); // Empty dependency array for setup only
+
+  // Handle URL parameter changes - only reload when URL actually changes
+  useEffect(() => {
+    console.log('URL parameters changed:', { categoryId, categoryType });
+    
+    // Only reload if the category ID actually changed
+    if (currentCategoryId.current !== categoryId) {
+      setIsLoading(true);
+      // Small delay to ensure any navigation state is settled
+      const timer = setTimeout(() => {
+        loadCategoryData();
+      }, 50);
+
+      return () => clearTimeout(timer);
+    }
+  }, [categoryId, categoryType, loadCategoryData]);
 
   const handlePriceFilterSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,7 +174,7 @@ const NoSidebar: NextPage = () => {
     if (!isNaN(val)) setMinPrice(val);
   };
 
-  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMaxPriceChange = (e: React.ChangeEvent<HTMLInputInput>) => {
     const val = parseFloat(e.target.value);
     if (!isNaN(val)) setMaxPrice(val);
   };
@@ -99,6 +191,13 @@ const NoSidebar: NextPage = () => {
     setselectedCatgeoryProducts(updatedProducts);
     setFilteredProducts(updatedProducts);
     updatePriceRangeFromFilteredProducts(updatedProducts);
+    
+    // Update current category tracking
+    if (updatedCategories.length > 0) {
+      currentCategoryId.current = updatedCategories[0].id;
+    } else {
+      currentCategoryId.current = null;
+    }
   };
 
   const getFilteredByCategoryProducts = (
@@ -110,27 +209,6 @@ const NoSidebar: NextPage = () => {
     });
     return catProds;
   };
-
-  const updatePriceRangeFromFilteredProducts = (
-    products: CategoryProducts[]
-  ) => {
-    const prices: number[] = products
-      .map((prod: any) => {
-        const id = categoryType === "discount" ? prod.id : prod.productId;
-        return searchController.getDetails(id, "getPrice");
-      })
-      .filter((p): p is number => typeof p === "number" && !isNaN(p));
-
-    if (prices.length > 0) {
-      setMinPrice(Math.min(...prices));
-      setMaxPrice(Math.max(...prices));
-    } else {
-      setMinPrice(0);
-      setMaxPrice(150);
-    }
-  };
-
-  //const allBrands = ["Frito Lay", "Nespresso", "Oreo", "Quaker", "Welch's"];
 
   const handleBrandChange = (brand: string) => {
     setSelectedBrands((prev) =>
@@ -209,32 +287,27 @@ const NoSidebar: NextPage = () => {
         </div>
       </div>
 
-      {/* Brands */}
-      {/* <div className="single-filter-box">
-        <h5 className="title">Select Brands</h5>
-        <div className="filterbox-body">
-          <div className="category-wrapper">
-            {allBrands.map((brand, i) => (
-              <div className="single-category" key={i}>
-                <input
-                  id={`brand${i + 1}`}
-                  type="checkbox"
-                  checked={selectedBrands.includes(brand)}
-                  onChange={() => handleBrandChange(brand)}
-                />
-                <label htmlFor={`brand${i + 1}`}>{brand}</label>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div> */}
-
       {/* New Products */}
       <div className="sidebar-new-product mt-4">
         <NewProduct />
       </div>
     </>
   );
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <Layout1>
+        <div className="shop-grid-sidebar-area rts-section-gap">
+          <div className="container">
+            <div className="text-center py-5">
+              <div>Loading...</div>
+            </div>
+          </div>
+        </div>
+      </Layout1>
+    );
+  }
 
   return (
     <Layout1>
@@ -257,11 +330,18 @@ const NoSidebar: NextPage = () => {
               <div className="collection-wrapper">
                 <div className="custom-container section-big-pb-space">
                   <Row>
-                    <Collection
-                      categoryProducts={filteredProducts}
-                      cols="col-xl-3 col-lg-3 col-sm-4 col-md-4 col-6 col-grid-box"
-                      layoutList=""
-                    />
+                    {filteredProducts.length > 0 ? (
+                      <Collection
+                        categoryProducts={filteredProducts}
+                        cols="col-xl-3 col-lg-3 col-sm-4 col-md-4 col-6 col-grid-box"
+                        layoutList=""
+                      />
+                    ) : (
+                      <div className="col-12 text-center py-5">
+                        <h4>No products found for this category</h4>
+                        <p>Please select a different category or check back later.</p>
+                      </div>
+                    )}
                   </Row>
                 </div>
               </div>
