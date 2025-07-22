@@ -205,7 +205,7 @@ const ProductBox: NextPage<productType> = ({
             <div className="col-lg-6 rtl-text">
               <div className="product-right">
                 <h2>{data?.name}</h2>
-                <h3>
+                <h3 className="theme-color price-tag">
                   {" "}
                   {selectedCurr.symbol}
                   {(price * selectedCurr.value).toFixed(2)}
@@ -225,6 +225,18 @@ const ProductBox: NextPage<productType> = ({
                 <div className="border-product">
                   <h6 className="product-title">product details</h6>
                   {/* <p>{item?.description}</p> */}
+                  <ul className="product-description-list">
+                    {data?.brandName && (
+                      <li><strong>Brand:</strong> {data.brandName}</li>
+                    )}
+                    {data?.categoryName && (
+                      <li><strong>Category:</strong> {data.categoryName}</li>                                            
+                     )}
+                     <li><strong>Type:</strong> Original</li> 
+                    {data?.tags && data.tags.length > 0 && (
+                      <li><strong>Tags:</strong> {data.tags.join(", ")}</li>
+                    )}
+                  </ul>
                 </div>
                 <div className="product-description border-product">
                   <div className="size-box">
