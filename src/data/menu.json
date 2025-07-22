@@ -60,5 +60,10 @@
     "path": "/pages/order-history",
     "title": "order history",
     "type": "link"
+  },
+  {
+    "path": "/pages/store",
+    "title": "All Stores",
+    "type": "link"
   }
 ]

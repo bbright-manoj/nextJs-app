@@ -121,23 +121,20 @@ const Search: NextPage = () => {
             </DropdownToggle>
             <DropdownMenu>
               {/* <DropdownItem key="all">{t("All Category")}</DropdownItem> */}
-              {allCategories.map(
-                (cat) =>
-                  cat.category_products.length ?? (
-                    <DropdownItem
-                      key={cat.id}
-                      className="custom-dropdown-item"
-                      onClick={() =>
-                        router.push(
-                          `/collections/no-sidebar?id=${cat.id}&type=category`
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      {cat.name}
-                    </DropdownItem>
-                  )
-              )}
+              {allCategories.map((cat) => (
+                <DropdownItem
+                  key={cat.id}
+                  className="custom-dropdown-item"
+                  onClick={() =>
+                    router.push(
+                      `/collections/no-sidebar?id=${cat.id}&type=category`
+                    )
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  {cat.name}
+                </DropdownItem>
+              ))}
             </DropdownMenu>
           </ButtonDropdown>
         </InputGroupText>

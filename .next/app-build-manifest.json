@@ -11,17 +11,35 @@
       "static/chunks/main-app.js",
       "static/chunks/app/(MainBody)/layout.js"
     ],
+    "/(MainBody)/pages/store/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(MainBody)/pages/store/page.css",
+      "static/chunks/app/(MainBody)/pages/store/page.js"
+    ],
     "/(MainBody)/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
       "static/css/app/(MainBody)/page.css",
       "static/chunks/app/(MainBody)/page.js"
     ],
-    "/(MainBody)/pages/account/cart/page": [
+    "/(MainBody)/pages/search/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/css/app/(MainBody)/pages/account/cart/page.css",
-      "static/chunks/app/(MainBody)/pages/account/cart/page.js"
+      "static/css/app/(MainBody)/pages/search/page.css",
+      "static/chunks/app/(MainBody)/pages/search/page.js"
+    ],
+    "/(MainBody)/pages/account/wishlist/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(MainBody)/pages/account/wishlist/page.css",
+      "static/chunks/app/(MainBody)/pages/account/wishlist/page.js"
+    ],
+    "/(MainBody)/pages/order-history/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(MainBody)/pages/order-history/page.css",
+      "static/chunks/app/(MainBody)/pages/order-history/page.js"
     ],
     "/(MainBody)/collections/no-sidebar/page": [
       "static/chunks/webpack.js",
