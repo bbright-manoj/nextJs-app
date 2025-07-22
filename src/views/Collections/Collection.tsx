@@ -54,6 +54,19 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
       : searchController.getDetails(item.productId, "getPrice");
   };
 
+  // Function to handle adding item to cart with price included
+  const handleAddToCart = (item: any, qty = 1) => {
+    const price = (categoryType === "discount")
+      ? searchController.getDetails(item.id, "getPrice")
+      : searchController.getDetails(item.productId, "getPrice");
+    const cartItem = {
+      ...item,
+      price: price,
+      id: categoryType === "discount" ? item.id : item.productId,
+    };
+    addToCart(cartItem, qty);
+  };
+
   const handlePagination = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -107,7 +120,7 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
                             newLabel={item.new}
                             item={item}
                             price={getPrice(item)}
-                            addCart={() => addToCart(item)}
+                            addCart={handleAddToCart}
                             addCompare={() => addToCompare(item)}
                             addWish={() => addToWish(item)}
                           />
