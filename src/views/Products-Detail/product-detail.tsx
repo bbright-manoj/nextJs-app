@@ -105,16 +105,16 @@ const ProductDetail: React.FC<ProductRightProps> = ({
       </div>
       <h2>{item.name}</h2>
       {item.discount ? (
-        <h4>
-          <del>
-            {symbol}
+        <h2>
+          <span className="text-danger me-3">
+            - 
+            {item.getDiscountAmount()}%
+          </span>
+          <del className="text-muted ">
+            M.R.P:{symbol}
             {item.getProductPrice() * value}
           </del>
-          <span>
-            {symbol}
-            {item.getDiscountAmount()} off
-          </span>
-        </h4>
+        </h2>
       ) : (
         ""
       )}
@@ -313,7 +313,7 @@ const ProductDetail: React.FC<ProductRightProps> = ({
           </ul> */}
           <div className="d-inline-block ">
             <button
-              className="wishlist-btn p-4 "
+              className="wishlist-btn p-4 center"
               onClick={() => {
                 addToWish(item);
               }}

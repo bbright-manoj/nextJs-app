@@ -47,7 +47,7 @@ const FooterSection: React.FC = () => {
                       {/* <p>
                         Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
                       </p> */}
-                      <ul className="paymant-bottom">
+                      <ul className="paymant-bottom d-flex justify-content-center align-items-center gap-2 list-unstyled m-0">
                         {[1, 2, 3, 4, 5].map((num) => (
                           <li key={num}>
                             <a href="#">
