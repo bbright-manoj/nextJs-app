@@ -282,9 +282,9 @@ const ProductDetail: React.FC<ProductRightProps> = ({
           </span>
         )}
       </div>
-      <div className="border-product">
+      <div className="border-product p-2 ">
         <div className="product-icon">
-          <ul className="product-social">
+          {/* <ul className="product-social">
             <li>
               <a href="#">
                 <i className="fa fa-facebook"></i>
@@ -310,16 +310,16 @@ const ProductDetail: React.FC<ProductRightProps> = ({
                 <i className="fa fa-rss"></i>
               </a>
             </li>
-          </ul>
-          <div className="d-inline-block">
+          </ul> */}
+          <div className="d-inline-block ">
             <button
-              className="wishlist-btn"
+              className="wishlist-btn p-4 "
               onClick={() => {
                 addToWish(item);
               }}
             >
               <i className="fa fa-heart"></i>
-              <span className="title-font">Add To WishList</span>
+              <span className="title-font ">Add To WishList</span>
             </button>
           </div>
         </div>
