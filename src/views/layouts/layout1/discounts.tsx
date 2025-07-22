@@ -75,11 +75,8 @@ const DiscountProducts: NextPage<Props> = ({ item, products = [] }) => {
           navigation
           loop={false}
           speed={2000}
-          autoplay={{
-            delay: 3000,
-            disableOnInteraction: true,
-            pauseOnMouseEnter: true,
-          }}
+          autoplay={{delay: 4000,  pauseOnMouseEnter: true}}
+          modules={[Navigation, Autoplay]}
           className={`discount-products-swiper ${products.length === 1 ? "single-banner" : ""}`}
           breakpoints={{
             0: { slidesPerView: 1 },
@@ -106,7 +103,7 @@ const DiscountProducts: NextPage<Props> = ({ item, products = [] }) => {
                   </div>
                 </Col>
                 {/* right products */}
-                <Col xl="8" lg="8" className="discount-products-col">
+                <Col xl="8" lg="12" className="discount-products-col">
                   <Row>
                     {(banner.discountItems ?? []).slice(0, 2).map((item: any, i: number) => {
                       const priceWithDiscount = getpricewithDiscount(item.id, item.discount);
@@ -140,7 +137,7 @@ const DiscountProducts: NextPage<Props> = ({ item, products = [] }) => {
                                 <h5 className="mb-1 fw-bold ms-2 mb-2">{item.name}</h5>
                                 <div className="d-flex align-items-center mb-2">
                                   <span className="text-muted ms-2 me-4 mb-3">
-                                    <del>
+                                    <del className="text-danger">
                                       {symbol}
                                       {(getPrice(item.id) * value).toFixed(2)}
                                     </del>
