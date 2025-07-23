@@ -5,7 +5,10 @@ import { API } from "@/app/services/api.service";
 import { useRouter } from "next/navigation";
 import { BusinessDetails } from "@/app/globalProvider";
 
-const FooterSection: React.FC = () => {
+type FooterProps = {
+  layoutLogo: string;
+};
+const FooterSection: React.FC<FooterProps> = ({ layoutLogo }) => {
   const router = useRouter();
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [business, setBusiness] = useState<BusinessDetails | null>(null);
@@ -47,11 +50,15 @@ const FooterSection: React.FC = () => {
                       {/* <p>
                         Contrary to popular belief, Lorem Ipsum is not simply random text. It has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old.
                       </p> */}
-                      <ul className="paymant-bottom">
+                      <ul className="paymant-bottom d-flex justify-content-center align-items-center gap-2 list-unstyled m-0">
                         {[1, 2, 3, 4, 5].map((num) => (
                           <li key={num}>
                             <a href="#">
-                              <Media src={`/images/layout-1/pay/${num}.png`} className="img-fluid" alt={`pay-${num}`} />
+                              <Media
+                                src={`/images/layout-1/pay/${num}.png`}
+                                className="img-fluid"
+                                alt={`pay-${num}`}
+                              />
                             </a>
                           </li>
                         ))}
@@ -106,10 +113,46 @@ const FooterSection: React.FC = () => {
                                 </div>
                                 <div className="footer-contant">
                                   <ul>
-                                    <li><a onClick={() => router.push("/pages/about-us")} style={{ cursor: "pointer" }}>About Us</a></li>                                                                        
-                                    <li><a onClick={() => router.push("/pages/ContactUs")} style={{ cursor: "pointer" }}>contact us</a></li>
-                                    <li><a onClick={() => router.push("/pages/terms")} style={{ cursor: "pointer" }}>terms & conditions</a></li>
-                                    <li><a onClick={() => router.push("/pages/privacy")} style={{ cursor: "pointer" }}>privacy Policy</a></li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/about-us")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        About Us
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/ContactUs")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        contact us
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/terms")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        terms & conditions
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/privacy")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        privacy Policy
+                                      </a>
+                                    </li>
                                     {/* <li><a href="#">returns & exchanges</a></li>
                                     <li><a href="#">shipping & delivery</a></li> */}
                                   </ul>
@@ -124,11 +167,33 @@ const FooterSection: React.FC = () => {
                                 </div>
                                 <div className="footer-contant">
                                   <ul>
-                                    <li><a onClick={() => router.push("/pages/store")} style={{ cursor: "pointer" }}>Store Location</a></li>                                                                        
-                                    <li><a onClick={() => router.push("/pages/account/profile")} style={{ cursor: "pointer" }}>my account</a></li>
-                                    <li><a href="#">orders tracking</a></li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/store")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        Store Location
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a
+                                        onClick={() =>
+                                          router.push("/pages/account/profile")
+                                        }
+                                        style={{ cursor: "pointer" }}
+                                      >
+                                        my account
+                                      </a>
+                                    </li>
+                                    <li>
+                                      <a href="#">orders tracking</a>
+                                    </li>
                                     {/* <li><a href="#">size guide</a></li> */}
-                                    <li><a href="#">FAQ</a></li>
+                                    <li>
+                                      <a href="#">FAQ</a>
+                                    </li>
                                   </ul>
                                 </div>
                               </div>
@@ -143,17 +208,25 @@ const FooterSection: React.FC = () => {
                                   <ul className="contact-list">
                                     <li>
                                       <i className="fa fa-map-marker"></i>
-                                      <span>{business?.address || "Loading address..."}<br />
+                                      <span>
+                                        {business?.address ||
+                                          "Loading address..."}
+                                        <br />
                                         <span>India</span>
                                       </span>
                                     </li>
                                     <li>
                                       <i className="fa fa-phone"></i>
-                                      <span>call us: {business?.phone || "Loading..."}</span>
-                                    </li>
-                                    <li><i className="fa fa-envelope-o"></i>
                                       <span>
-                                        email us: {business?.email || "Loading..."}
+                                        call us:{" "}
+                                        {business?.phone || "Loading..."}
+                                      </span>
+                                    </li>
+                                    <li>
+                                      <i className="fa fa-envelope-o"></i>
+                                      <span>
+                                        email us:{" "}
+                                        {business?.email || "Loading..."}
                                       </span>
                                     </li>
                                     {/* <li><i className="fa fa-fax"></i><span>fax 123456</span></li> */}
@@ -207,7 +280,9 @@ const FooterSection: React.FC = () => {
           <Row>
             <Col xs="12">
               <div className="sub-footer-contain">
-                <p><span>2025 </span>Copyright @rupeecom</p>
+                <p>
+                  <span>2025 </span>Copyright @rupeecom
+                </p>
               </div>
             </Col>
           </Row>

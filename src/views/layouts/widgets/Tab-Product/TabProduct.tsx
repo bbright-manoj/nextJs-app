@@ -58,10 +58,9 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
 
   // Function to handle adding item to cart with price included
   const handleAddToCart = (item: any, qty = 1) => {
-    const price = searchController.getDetails(item.productId, "getPrice");
     const cartItem = {
       ...item,
-      price: price,
+      price: getPrice(item.productId),
       id: item.productId,
     };
     addToCart(cartItem, qty);

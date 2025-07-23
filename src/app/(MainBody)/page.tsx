@@ -106,7 +106,7 @@ const Home = () => {
             <section className="instagram">
               <InstagramSection />
             </section>
-            <ContactBanner /> */}
+        <ContactBanner />*/}
       </Layouts>
     </>
   );

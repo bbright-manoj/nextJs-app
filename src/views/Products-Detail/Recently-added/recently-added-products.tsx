@@ -19,12 +19,18 @@ const RecentlyAddedProducts: React.FC = () => {
   const { addToWish } = React.useContext(WishlistContext);
   const { addToCart } = React.useContext(CartContext);
   const { addToCompare } = React.useContext(CompareContext);
+
+  const getPrice = (productId: string) => {
+    const price = searchController.getDetails(productId, "getPrice");
+
+    return price;
+  };
+
   // Function to handle adding item to cart with price included
   const handleAddToCart = (item: any, qty = 1) => {
-    const price = searchController.getDetails(item.productId, "getPrice");
     const cartItem = {
       ...item,
-      price: price,
+      price: getPrice(item.productId),
       id: item.id,
     };
     addToCart(cartItem, qty);
@@ -100,7 +106,7 @@ const RecentlyAddedProducts: React.FC = () => {
                       id={Number(product.id)}
                       name={product.name}
                       img={product.img}
-                      price={product.sellingPrice}
+                      price={getPrice(product.id)}
                       hoverEffect={"icon-inline"}
                       discount={product.discount?.discount || 0}
                       rating={product.rating?.calculateRating() || 0}

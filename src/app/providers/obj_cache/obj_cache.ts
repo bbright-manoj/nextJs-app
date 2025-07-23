@@ -144,7 +144,7 @@ export class ObjCache extends EventEmitter {
   }
 
   insertObjCacheAllProducts(lst: any) {
-    this.allProducstsList = lst;
+    //this.allProducstsList = lst;
     this.emit("updateAllProducts", lst);
     this.emit("update");
   }
@@ -230,6 +230,7 @@ export class ObjCache extends EventEmitter {
     if (product) return product;
 
     product = this.getAllProducts().find((p) => p.id === id);
+    console.log(product);
     if (product) return product;
 
     return null;
@@ -268,7 +269,10 @@ export class ObjCache extends EventEmitter {
   }
 
   getAllProducts(): Product[] {
-    return Array.from(this.allProducts.values()).flat();
+    console.log("All products list:", this.allProducstsList);
+    return this.allProducstsList.length
+      ? this.allProducstsList
+      : Array.from(this.allProducts.values()).flat();
   }
 
   getAllKits(): Kit[] {

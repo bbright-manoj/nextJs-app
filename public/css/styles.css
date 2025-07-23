@@ -16632,7 +16632,13 @@ a.over_link {
   background: #fff;
   padding: 20px;
   transition: box-shadow 0.3s ease;
-   cursor: pointer;
+  cursor: pointer;
+}
+.contact-banner-contain h3,
+.contact-banner-contain h2 {
+  color: #fff;
+  text-align: center;
+  margin: 0;
 }
 
 @media only screen and (max-width: 1300px) {
@@ -18657,7 +18663,7 @@ li.with-megamenu:hover .rts-megamenu {
 .cover-card-main-over {
   padding: 30px;
   border-radius: 6px;
-  background: #f5f6f7;
+  
 }
 
 .cover-card-main-over-white {
@@ -19668,7 +19674,7 @@ li.with-megamenu:hover .rts-megamenu {
 .cover-card-main-over {
   padding: 30px;
   border-radius: 6px;
-  background: #f5f6f7;
+  
 }
 
 @media only screen and (max-width: 575px) {

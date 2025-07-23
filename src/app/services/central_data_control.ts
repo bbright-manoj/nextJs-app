@@ -141,6 +141,7 @@ export class CentralDataCollector {
       const allProducts = await API.getAllProducts();
       objCache.resetObjCacheAllProducts();
       allProducts.forEach((products: any, category: { name: any }) => {
+        objCache.allProducstsList.push(...products);
         objCache.allProducts.set(category.name, products);
       });
       objCache.insertObjCacheAllProducts(allProducts);
