@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from "react";
 import { NextPage } from "next";
 import { Container, Row, Col } from "reactstrap";
-import { searchController, SearchPageControl } from "@/app/globalProvider";
+import { Product, searchController } from "@/app/globalProvider";
 import Link from "next/link";
+import ProductBox from "../layouts/widgets/Product-Box/productbox";
+import { WishlistContext } from "@/helpers/wishlist/wish.context";
+import { CartContext } from "@/helpers/cart/cart.context";
+import { CompareContext } from "@/helpers/compare/compare.context";
 
-const localSearch = new SearchPageControl();
-const ITEMS_PER_PAGE = 12;
-
-
+//const localSearch = new SearchPageControl();
+const ITEMS_PER_PAGE = 50;
 
 const ProductList: React.FC<{ item: any }> = ({ item }) => {
   const imageSrc1 = item?.img?.[0] || "/placeholder.png";
@@ -17,7 +19,9 @@ const ProductList: React.FC<{ item: any }> = ({ item }) => {
   const discount = item.getDiscount?.() ?? item.discount ?? "$0.00";
 
   const isKit = item?.type === "kit"; // Ensure this is set in your data
-  const detailPath = isKit ? "/product-details" : "/product-details/thumbnail-left";
+  const detailPath = isKit
+    ? "/product-details"
+    : "/product-details/thumbnail-left";
   const detailQuery = { id: item.id };
 
   return (
@@ -52,10 +56,18 @@ const ProductList: React.FC<{ item: any }> = ({ item }) => {
               </div>
             </div>
             <div className="icon-detail">
-              <button title="Add to cart"><i className="ti-bag" /></button>
-              <a href="#" title="Wishlist"><i className="ti-heart" /></a>
-              <a href="#" title="Quick View"><i className="ti-search" /></a>
-              <a href="#" title="Compare"><i className="fa fa-exchange" /></a>
+              <button title="Add to cart">
+                <i className="ti-bag" />
+              </button>
+              <a href="#" title="Wishlist">
+                <i className="ti-heart" />
+              </a>
+              <a href="#" title="Quick View">
+                <i className="ti-search" />
+              </a>
+              <a href="#" title="Compare">
+                <i className="fa fa-exchange" />
+              </a>
             </div>
           </div>
         </div>
@@ -64,33 +76,44 @@ const ProductList: React.FC<{ item: any }> = ({ item }) => {
   );
 };
 
-
-
 const SearchPage: NextPage = () => {
   const [query, setQuery] = useState("");
   const [allItems, setAllItems] = useState<any[]>([]);
   const [filteredItems, setFilteredItems] = useState<any[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
+  const { addToWish } = React.useContext(WishlistContext);
+  const { addToCart } = React.useContext(CartContext);
+  const { addToCompare } = React.useContext(CompareContext);
+
+  const handleAddToCart = (item: any, qty = 1) => {
+    const cartItem = {
+      ...item,
+      price: item.getPrice(),
+      id: item.productId,
+    };
+    addToCart(cartItem, qty);
+  };
+
   // Initial load (show all items)
   useEffect(() => {
-    localSearch.clearText();
+    searchController.clearText();
     searchController.searchInput = "";
     searchController.showEmptySearchResult = false;
 
     // Load all data initially
-    localSearch.refreshGrid(""); // empty query to load everything
+    searchController.refreshGrid(""); // empty query to load everything
 
     const updateItems = () => {
-      const combined = [...localSearch.products, ...localSearch.kits];
+      const combined = [...searchController.products, ...searchController.kits];
       setAllItems(combined);
       setFilteredItems(combined);
       setCurrentPage(1);
     };
 
-    localSearch.on("update", updateItems);
+    searchController.on("update", updateItems);
     return () => {
-      localSearch.off("update", updateItems);
+      searchController.off("update", updateItems);
     };
   }, []);
 
@@ -98,19 +121,20 @@ const SearchPage: NextPage = () => {
     const value = e.target.value;
     setQuery(value);
     setCurrentPage(1);
-    localSearch.refreshGrid(value);
+    searchController.refreshGrid(value);
   };
 
   // Update filteredItems when query changes and new data comes
   useEffect(() => {
-    const combined = [...localSearch.products, ...localSearch.kits];
+    //console.log(searchController.products);
+    const combined = [...searchController.products, ...searchController.kits];
     const filtered = query.trim()
       ? combined.filter((item) =>
           item.name?.toLowerCase().includes(query.toLowerCase())
         )
       : combined;
     setFilteredItems(filtered);
-  }, [query, localSearch.products, localSearch.kits]);
+  }, [query, searchController.products, searchController.kits]);
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const paginatedItems = filteredItems.slice(
@@ -152,21 +176,37 @@ const SearchPage: NextPage = () => {
       <section className="section-big-py-space ratio_asos bg-light">
         <div className="custom-container">
           <div className="row search-product related-pro1">
-            {paginatedItems.length > 0 ? (
-              paginatedItems.map((item, index) => (
-                <ProductList item={item} key={index} />
-              ))
-            ) : (
-              <Col className="text-center w-100">
-                <p>No matching products or kits found.</p>
-              </Col>
-            )}
+            <div className="product product-slide-6 product-m no-arrow">
+              <Row>
+                {paginatedItems.length > 0 ? (
+                  paginatedItems.map((item: Product) => (
+                    <Col xl="2" md="4" sm="6" lg="4" key={item.id}>
+                      <ProductBox
+                        layout="layout-one"
+                        price={item.getPrice()}
+                        hoverEffect={"icon-inline"}
+                        data={item}
+                        addCart={handleAddToCart}
+                        addCompare={() => addToCompare(item)}
+                        addWish={() => addToWish(item)}
+                      />
+                    </Col>
+                  ))
+                ) : (
+                  <Col className="text-center w-100">
+                    <p>No matching products or kits found.</p>
+                  </Col>
+                )}
+              </Row>
+            </div>
           </div>
 
           {filteredItems.length > ITEMS_PER_PAGE && (
             <div className="pagination-bar text-center mt-4">
               <ul className="pagination justify-content-center">
-                <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                <li
+                  className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                >
                   <button
                     className="page-link"
                     onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
@@ -177,7 +217,9 @@ const SearchPage: NextPage = () => {
                 {Array.from({ length: totalPages }, (_, i) => (
                   <li
                     key={i}
-                    className={`page-item ${currentPage === i + 1 ? "active" : ""}`}
+                    className={`page-item ${
+                      currentPage === i + 1 ? "active" : ""
+                    }`}
                   >
                     <button
                       className="page-link"
@@ -187,7 +229,11 @@ const SearchPage: NextPage = () => {
                     </button>
                   </li>
                 ))}
-                <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                <li
+                  className={`page-item ${
+                    currentPage === totalPages ? "disabled" : ""
+                  }`}
+                >
                   <button
                     className="page-link"
                     onClick={() =>

@@ -12,9 +12,7 @@ const Loader = (props) => {
     <Fragment>
       {isLoading ? (
         <div className="loader-wrapper">
-          <div>
-            <img src="/images/loader.gif" alt="loader"/>
-          </div>
+          <div>{/* <img src="/images/loader.gif" alt="loader"/> */}</div>
         </div>
       ) : (
         props.children
