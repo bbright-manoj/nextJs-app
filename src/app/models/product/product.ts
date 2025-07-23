@@ -400,9 +400,7 @@ export class Product {
       purchaseOptionIndex =
         this.sellingDisplayOptions.indexOf(purchaseOptionStr);
     }
-    console.log(
-      `Purchase Option Index: ${purchaseOptionIndex}, Selling Prices: ${this.sellingPrices}`
-    );
+
     if (this.saleMode === "custom" || this.saleMode === "flexible") {
       return (this.sellingPrices[purchaseOptionIndex] || 0) * cartQuantity;
     }

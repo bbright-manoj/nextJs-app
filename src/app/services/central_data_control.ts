@@ -144,7 +144,7 @@ export class CentralDataCollector {
         objCache.allProducstsList.push(...products);
         objCache.allProducts.set(category.name, products);
       });
-      objCache.insertObjCacheAllProducts(allProducts);
+      objCache.insertObjCacheAllProducts(objCache.allProducstsList);
     } catch (error) {
       console.error("Error fetching jobs:", error);
     }

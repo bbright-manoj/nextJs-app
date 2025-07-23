@@ -106,10 +106,7 @@ const ProductDetail: React.FC<ProductRightProps> = ({
       <h2>{item.name}</h2>
       {item.discount ? (
         <h2>
-          <span className="text-danger me-3">
-            - 
-            {item.getDiscountAmount()}%
-          </span>
+          <span className="text-danger me-3">-{item.getDiscount()}%</span>
           <del className="text-muted ">
             M.R.P:{symbol}
             {item.getProductPrice() * value}
@@ -275,42 +272,17 @@ const ProductDetail: React.FC<ProductRightProps> = ({
         <span className="tags product-unipue mb--10">
           <strong>Type:</strong> original
         </span>
-        {item.brandName ?? (
+        {item.brandName ? (
           <span className="tags product-unipue mb--10">
-            <strong>BrandName:</strong>
+            <strong>Brand Name: </strong>
             {item.brandName}
           </span>
+        ) : (
+          <></>
         )}
       </div>
-      <div className="border-product p-2 ">
+      <div className="border-product ">
         <div className="product-icon">
-          {/* <ul className="product-social">
-            <li>
-              <a href="#">
-                <i className="fa fa-facebook"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-google-plus"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-twitter"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-instagram"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-rss"></i>
-              </a>
-            </li>
-          </ul> */}
           <div className="d-inline-block ">
             <button
               className="wishlist-btn p-4 center"

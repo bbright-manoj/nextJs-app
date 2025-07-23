@@ -94,7 +94,7 @@ const Kits: NextPage<KitsProps> = ({ kits = [] }) => {
                       )
                     }
                   >
-                    <Link href="#" className="single-category-one height-180">
+                    <Link href="#" className="single-category-one height-200">
                       <div className="thumbnail-preview w-full ">
                         <Media
                           src={kit.img[0]}

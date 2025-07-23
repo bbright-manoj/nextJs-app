@@ -30,7 +30,7 @@ const RecentlyAddedProducts: React.FC = () => {
   const handleAddToCart = (item: any, qty = 1) => {
     const cartItem = {
       ...item,
-      price: getPrice(item.productId),
+      price: item.getPrice(),
       id: item.id,
     };
     addToCart(cartItem, qty);
@@ -39,6 +39,7 @@ const RecentlyAddedProducts: React.FC = () => {
   useEffect(() => {
     // Get recently added products
     const products = objCache.getRecentlyAddedProducts(8);
+    console.log("Recently added products:", products);
     setRecentProducts(products);
     setLoading(false);
 
@@ -100,13 +101,13 @@ const RecentlyAddedProducts: React.FC = () => {
                 breakpoints={appConfig.mediaQueries}
                 modules={[Navigation, Autoplay]}
               >
-                {recentProducts.map((product) => (
+                {recentProducts.map((product: Product) => (
                   <SwiperSlide key={product.id}>
                     <ProductBox
                       id={Number(product.id)}
                       name={product.name}
                       img={product.img}
-                      price={getPrice(product.id)}
+                      price={product.getPrice()}
                       hoverEffect={"icon-inline"}
                       discount={product.discount?.discount || 0}
                       rating={product.rating?.calculateRating() || 0}

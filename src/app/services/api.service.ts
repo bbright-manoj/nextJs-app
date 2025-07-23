@@ -36,8 +36,8 @@ import {
 import { ClientStorage } from "@/utils/storage";
 
 // Configuration
-//const API_BASE_URL = appConfig.apiBaseUrl;
-const API_BASE_URL = "https://devqarupeecomservice.rupeecom.in/v1";
+const API_BASE_URL = appConfig.apiBaseUrl;
+//const API_BASE_URL = "https://devqarupeecomservice.rupeecom.in/v1";
 
 const DEV_API_BASE_URL = API_BASE_URL;
 const TENANT_SERVICE_URL = appConfig.tenantServiceUrl;
@@ -483,7 +483,7 @@ export class APIService {
   }
 
   // All Products
-  async getAllProducts(): Promise<Map<CategoryRender, Product[]>> {
+  async getAllProducts() {
     try {
       const response = await this.get<{ data: any[] }>(
         `${this.baseURL}/fetch-all-products`,
@@ -491,7 +491,8 @@ export class APIService {
           tenant_id: this.tenantId,
         }
       );
-
+      console.log("All Products Response:", response);
+      // return response.data;
       const allProducts = new Map<CategoryRender, Product[]>();
       for (const element of response.data) {
         try {
@@ -509,9 +510,9 @@ export class APIService {
           for (const p of element.products) {
             try {
               const premiumProduct = Product.fromJson(p, true);
-              const nonPremiumProduct = Product.fromJson(p, false);
+              //const nonPremiumProduct = Product.fromJson(p, false);
               allProducts.get(sr)?.push(premiumProduct);
-              allProducts.get(sr)?.push(nonPremiumProduct);
+              //allProducts.get(sr)?.push(nonPremiumProduct);
             } catch (e) {
               console.error(`Error parsing product: ${JSON.stringify(p)}`);
             }

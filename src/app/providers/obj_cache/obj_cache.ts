@@ -230,7 +230,7 @@ export class ObjCache extends EventEmitter {
     if (product) return product;
 
     product = this.getAllProducts().find((p) => p.id === id);
-    console.log(product);
+
     if (product) return product;
 
     return null;
@@ -269,7 +269,6 @@ export class ObjCache extends EventEmitter {
   }
 
   getAllProducts(): Product[] {
-    console.log("All products list:", this.allProducstsList);
     return this.allProducstsList.length
       ? this.allProducstsList
       : Array.from(this.allProducts.values()).flat();

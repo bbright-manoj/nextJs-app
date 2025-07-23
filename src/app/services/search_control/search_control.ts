@@ -109,7 +109,6 @@ export class SearchPageControl extends EventEmitter {
   loadSearchData() {
     this.getAllProducts();
     this.getKits();
-    this.products = this.allProducts.values();
     this.allTags = this.getAllTags();
   }
 
@@ -166,14 +165,12 @@ export class SearchPageControl extends EventEmitter {
       : [];
   }
   getAllProducts() {
+    // this.allProducts = objCache.getAllProducts();
+    // this.update();
     objCache.on("updateAllProducts", (data) => {
-      this.allProducts =
-        data instanceof Map
-          ? Array.from(data.values()).flat()
-          : Array.isArray(data)
-          ? data
-          : [];
-
+      console.log(data);
+      this.allProducts = data;
+      this.products = data;
       this.update();
     });
   }
@@ -325,9 +322,8 @@ export class SearchPageControl extends EventEmitter {
 
   getDetails(productId: string, eventName: string) {
     var foundItem;
-    console.log("Searching for productId:", productId);
+
     foundItem = objCache.getProductById(productId);
-    console.log("Found item:", foundItem);
 
     if (foundItem) {
       if (eventName == "getPrice") return foundItem.getPrice();
