@@ -158,6 +158,7 @@ export class CentralDataCollector {
       await Promise.all([
         this.getAnnounce(),
         this.getAllBanners(),
+        this.getBanners(),
         this.getCategories(),
         this.getAllCategories(),
         this.getDiscounts(),
