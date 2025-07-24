@@ -99,7 +99,7 @@ const CategoryPage: NextPage = () => {
   return (
     <>
       <Breadcrumb title="Categories" parent="home" />
-      <section className="authentication-page ptb--20 bg-light">
+      <section className="authentication-page ptb--20">
         <div className="custom-container">
           <section className="search-block">
             <Container>

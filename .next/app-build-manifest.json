@@ -22,6 +22,18 @@
       "static/chunks/main-app.js",
       "static/css/app/(MainBody)/pages/categories/page.css",
       "static/chunks/app/(MainBody)/pages/categories/page.js"
+    ],
+    "/(MainBody)/pages/search/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(MainBody)/pages/search/page.css",
+      "static/chunks/app/(MainBody)/pages/search/page.js"
+    ],
+    "/(MainBody)/product-details/[id]/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(MainBody)/product-details/[id]/page.css",
+      "static/chunks/app/(MainBody)/product-details/[id]/page.js"
     ]
   }
 }
