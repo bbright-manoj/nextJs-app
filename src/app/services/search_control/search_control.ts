@@ -112,6 +112,24 @@ export class SearchPageControl extends EventEmitter {
     this.allTags = this.getAllTags();
   }
 
+  matchScore(name: string): number {
+    const lowerName = name.toLowerCase();
+    if (lowerName.startsWith(this.searchStr)) return 2;
+    if (lowerName.includes(this.searchStr)) return 1;
+    return 0;
+  }
+
+  filterAndSort = <T extends { name: string }>(items: T[]): T[] => {
+    return items
+      .map((item) => ({
+        item,
+        score: this.matchScore(item.name),
+      }))
+      .filter((entry) => entry.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .map((entry) => entry.item);
+  };
+
   refreshGrid(str: string) {
     this.searchInput = str;
     this.searchStr = str.trim().toLowerCase();
@@ -126,29 +144,11 @@ export class SearchPageControl extends EventEmitter {
       return;
     }
 
-    const matchScore = (name: string): number => {
-      const lowerName = name.toLowerCase();
-      if (lowerName.startsWith(this.searchStr)) return 2;
-      if (lowerName.includes(this.searchStr)) return 1;
-      return 0;
-    };
-
-    const filterAndSort = <T extends { name: string }>(items: T[]): T[] => {
-      return items
-        .map((item) => ({
-          item,
-          score: matchScore(item.name),
-        }))
-        .filter((entry) => entry.score > 0)
-        .sort((a, b) => b.score - a.score)
-        .map((entry) => entry.item);
-    };
-
     // Filter kits
-    this.kits = filterAndSort(this.allKits);
+    this.kits = this.filterAndSort(this.allKits);
 
     const allProductsArray: Product[] = this.allProducts;
-    this.products = filterAndSort(allProductsArray);
+    this.products = this.filterAndSort(allProductsArray);
 
     // Show/hide "no results"
     this.showEmptySearchResult =
@@ -168,7 +168,6 @@ export class SearchPageControl extends EventEmitter {
     // this.allProducts = objCache.getAllProducts();
     // this.update();
     objCache.on("updateAllProducts", (data) => {
-      console.log(data);
       this.allProducts = data;
       this.products = data;
       this.update();
@@ -336,6 +335,17 @@ export class SearchPageControl extends EventEmitter {
     }
 
     return 0;
+  }
+
+  getFilteredCategories(str: string, categories: Category[]) {
+    const searchText = str.toLowerCase();
+
+    let filteredCategories = categories.filter((category: Category) => {
+      const matchesSearch =
+        searchText === "" || category.name.toLowerCase().includes(searchText);
+    });
+
+    return filteredCategories;
   }
 }
 

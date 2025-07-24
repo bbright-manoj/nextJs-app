@@ -145,7 +145,7 @@ const SearchPage: NextPage = () => {
   return (
     <>
       <section className="authentication-page section-big-pt-space bg-light">
-        <div className="custom-containe">
+        <div className="custom-container">
           <section className="search-block">
             <Container>
               <Row>

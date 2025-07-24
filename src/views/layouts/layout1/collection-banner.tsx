@@ -33,6 +33,8 @@ const CollectionBanner: NextPage<Props> = ({
     router.push(`/product-details/${id}`);
   };
 
+  console.log(categories);
+
   if (categories.length) {
     return (
       <>

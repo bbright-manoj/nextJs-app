@@ -36,8 +36,8 @@ import {
 import { ClientStorage } from "@/utils/storage";
 
 // Configuration
-const API_BASE_URL = appConfig.apiBaseUrl;
-//const API_BASE_URL = "https://devqarupeecomservice.rupeecom.in/v1";
+//const API_BASE_URL = appConfig.apiBaseUrl;
+const API_BASE_URL = "https://devqarupeecomservice.rupeecom.in/v1";
 
 const DEV_API_BASE_URL = API_BASE_URL;
 const TENANT_SERVICE_URL = appConfig.tenantServiceUrl;
@@ -631,7 +631,9 @@ export class APIService {
         return response.data
           .map((categoryData) => {
             try {
-              return Category.fromMap(categoryData);
+              return categoryData.category_products.length
+                ? Category.fromMap(categoryData)
+                : null;
             } catch (e) {
               console.error(
                 `Error parsing category: ${JSON.stringify(categoryData)}`
@@ -661,7 +663,9 @@ export class APIService {
         return response.data
           .map((categoryData) => {
             try {
-              return Category.fromMap(categoryData);
+              return categoryData.category_products.length
+                ? Category.fromMap(categoryData)
+                : null;
             } catch (e) {
               console.error(
                 `Error parsing category: ${JSON.stringify(categoryData)}`

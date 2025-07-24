@@ -91,7 +91,12 @@ const UserProfile: NextPage = () => {
         </a>
       </li>
 
-      <div id="myAccount" className={`add_to_cart right account-bar ${openAccount ? "open-side" : ""}`}>
+      <div
+        id="myAccount"
+        className={`add_to_cart right account-bar ${
+          openAccount ? "open-side" : ""
+        }`}
+      >
         <a href="#" className="overlay" onClick={toggleAccount}></a>
         <div className="cart-inner">
           <div className="cart_top">
@@ -135,7 +140,10 @@ const UserProfile: NextPage = () => {
                 {otpSent && (
                   <>
                     <Label className="form-label">Enter OTP</Label>
-                    <div className="d-flex justify-content-center mb-3 otp-inputs" style={{ gap: "8px" }}>
+                    <div
+                      className="d-flex justify-content-center mb-3 otp-inputs"
+                      style={{ gap: "8px" }}
+                    >
                       {otpArray.map((val, i) => (
                         <input
                           key={i}
@@ -187,7 +195,11 @@ const UserProfile: NextPage = () => {
 
             {user && (
               <FormGroup>
-                <button type="button" className="btn btn-danger w-100 mt-3" onClick={signout}>
+                <button
+                  type="button"
+                  className="btn btn-danger w-100 mt-3"
+                  onClick={signout}
+                >
                   Logout
                 </button>
               </FormGroup>
@@ -204,9 +216,7 @@ const UserProfile: NextPage = () => {
                       router.push("/pages/account/register");
                       setOpenAccount(false);
                     }}
-                  >
-                    
-                  </a>
+                  ></a>
                 </h6>
               </FormGroup>
             )}

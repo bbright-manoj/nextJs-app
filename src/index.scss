@@ -28944,6 +28944,118 @@ select {
   cursor: pointer;
 }
 
+.collection-product-wrapper .product-top-filter {
+  border-bottom: 1px solid #dddddd;
+  border-top: 1px solid #dddddd;
+}
+
+.product-top-filter .product-filter-content,
+.product-top-filter .popup-filter {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+.product-top-filter .product-filter-content .search-count,
+.product-top-filter .product-filter-content .sidebar-popup,
+.product-top-filter .popup-filter .search-count,
+.collection-product-wrapper .product-top-filter .popup-filter .sidebar-popup {
+  border-right: 1px solid #dddddd;
+  padding: 20px;
+  text-transform: capitalize;
+  width: 35%;
+  font-size: calc(14px + 2 * (100vw - 320px) / 1600);
+}
+
+.product-top-filter .product-filter-content .collection-view,
+.product-top-filter .popup-filter .collection-view {
+  padding: 20px;
+  width: 10%;
+  ul li {
+    margin-right: 10px;
+  }
+}
+.product-top-filter .product-filter-content .collection-grid-view,
+.product-top-filter .popup-filter .collection-grid-view {
+  padding: 20px;
+  width: 20%;
+  border-right: 1px solid #dddddd;
+}
+
+.product-top-filter .product-filter-content .product-page-per-view,
+.product-top-filter .product-filter-content .product-page-filter,
+.product-top-filter .popup-filter .product-page-per-view,
+.product-top-filter .popup-filter .product-page-filter {
+  position: relative;
+  width: 20%;
+  select {
+    border: 0;
+    padding: 20px;
+    border-right: 1px solid #dddddd;
+    width: 100%;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    cursor: pointer;
+    background: url(/images/dropdown.png) no-repeat 95%;
+    color: #333333;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    font-size: calc(14px + 2 * (100vw - 320px) / 1600);
+    height: 100%;
+    border-radius: 6px;
+  }
+}
+
+.product-top-filter .product-filter-content .product-page-filter,
+.product-top-filter .popup-filter .product-page-filter {
+  width: 15%;
+}
+.product-top-filter .product-filter-content .collection-grid-view ul,
+.product-top-filter .popup-filter .collection-grid-view ul {
+  display: flex;
+  justify-content: flex-end;
+  li {
+    margin-left: 10px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .product-top-filter .product-filter-content .search-count {
+    width: 100%;
+    border-left: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+  }
+}
+
+@media (max-width: 1470px) {
+  .product-top-filter .product-filter-content .search-count {
+    width: 100%;
+    border-left: 1px solid #dddddd;
+    border-bottom: 1px solid #dddddd;
+    text-align: center;
+  }
+  .product-top-filter .product-filter-content .collection-view {
+    width: 20%;
+    padding-right: 0 !important;
+    border-left: 1px solid #dddddd;
+  }
+
+  .product-top-filter .product-filter-content .collection-grid-view {
+    padding: 20px !important;
+    padding-left: 0 !important;
+    width: 20%;
+  }
+  .product-top-filter .product-filter-content .product-page-per-view {
+    width: 30%;
+  }
+
+  .product-top-filter .product-filter-content .product-page-filter {
+    border-right: 1px solid #dddddd;
+    width: 30%;
+  }
+}
+
 @media only screen and (min-width: 768px) and (max-width: 991px) {
   .rts-section-gapBottom {
     padding-bottom: 60px;
@@ -31145,6 +31257,11 @@ li a:hover .category-name {
   border: 1px solid #dee2e6;
 }
 
+.category-item h5 {
+  font-size: 14px;
+  margin-top: 15px;
+}
+
 /* Responsive Styles */
 
 /* Large Tablets and Small Desktops */
@@ -31267,6 +31384,12 @@ li a:hover .category-name {
 
   .empty-state-icon {
     font-size: 3rem;
+  }
+  .product-top-filter .product-filter-content .product-page-per-view {
+    width: 52%;
+  }
+  .search-count h5 {
+    font-size: 14px;
   }
 }
 
@@ -31433,6 +31556,9 @@ li a:hover .category-name {
     transition: all 0.5s ease;
     box-shadow: 1px 0 5px #ddd;
   }
+  .category-item h5 {
+    font-size: 14px;
+  }
 }
 .footer-contant {
   max-height: 500px;
@@ -31441,6 +31567,10 @@ li a:hover .category-name {
 }
 
 @media (max-width: 767px) {
+  .category-item h5 {
+    font-size: 14px;
+    margin-top: 15px;
+  }
   .footer-contant.closed {
     max-height: 0;
     padding: 0;
