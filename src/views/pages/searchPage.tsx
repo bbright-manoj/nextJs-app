@@ -293,7 +293,7 @@ const SearchPage: NextPage = () => {
                 className="collection-grid-view d-sm-none d-lg-block"
                 style={layout === "list-view" ? { opacity: 0 } : { opacity: 1 }}
               >
-                <ul>
+                <ul className="d-sm-none d-lg-block">
                   <li onClick={() => setGrid("col-lg-6 col-sm-6")}>
                     <img
                       src="/images/category/icon/2.png"
@@ -318,7 +318,7 @@ const SearchPage: NextPage = () => {
                 </ul>
               </div>
               <div className="product-page-per-view">
-                <select onChange={handleRangeChange}>
+                <select name="pagination" onChange={handleRangeChange}>
                   {rangeOptions.map((option, index) => (
                     <option key={index} value={option.label}>
                       {option.label}
@@ -327,7 +327,10 @@ const SearchPage: NextPage = () => {
                 </select>
               </div>
               <div className="product-page-filter">
-                <select onChange={(e) => setSortBy(e.target.value)}>
+                <select
+                  name="filter"
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
                   <option value="">Sorting items</option>
                   <option
                     value="HIGH_TO_LOW"
@@ -357,7 +360,7 @@ const SearchPage: NextPage = () => {
         </Row>
       </div>
 
-      <section className="section-big-py-space ratio_asos bg-light">
+      <section className="section-big-py-space ratio_asos">
         <div className="custom-container">
           <div className="row search-product related-pro1">
             <div

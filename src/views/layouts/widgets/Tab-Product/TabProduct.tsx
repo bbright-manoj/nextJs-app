@@ -69,7 +69,7 @@ const TabProduct: NextPage<TabProductProps> = ({ effect, categories }) => {
     addToCart(cartItem, qty);
   };
 
-  if (categories)
+  if (categories?.length)
     return (
       <>
         <section className="section-pt-space">
