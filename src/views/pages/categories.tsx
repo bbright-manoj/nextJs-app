@@ -152,7 +152,7 @@ const CategoryPage: NextPage = () => {
                         filteredCategories.length
                       )} of ${filteredCategories.length}`
                     : "loading"}{" "}
-                  Result
+                  Results
                 </h5>
               </div>
               <div className="collection-view">
