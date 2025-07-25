@@ -144,6 +144,7 @@ const SearchPage: NextPage = () => {
   const maxRanges = 5;
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const paginatedItems = filteredItems.slice(...currentRange);
+  const [sortBy, setSortBy] = useState("ASC_ORDER");
 
   const rangeOptions = useMemo(() => {
     const ranges: Array<{ label: string; value: [number, number] }> = [];
@@ -244,6 +245,7 @@ const SearchPage: NextPage = () => {
                     <i className="fa fa-th grid-layout-view"></i>
                   </li>
                   <li
+                    className="d-sm-block d-lg-none"
                     onClick={() => {
                       setLayout("list-view");
                       setGrid("col-lg-12");
@@ -254,7 +256,7 @@ const SearchPage: NextPage = () => {
                 </ul>
               </div>
               <div
-                className="collection-grid-view d-sm-none"
+                className="collection-grid-view d-sm-none d-lg-block"
                 style={layout === "list-view" ? { opacity: 0 } : { opacity: 1 }}
               >
                 <ul>
@@ -288,6 +290,16 @@ const SearchPage: NextPage = () => {
                       {option.label}
                     </option>
                   ))}
+                </select>
+              </div>
+              <div className="product-page-filter">
+                <select onChange={(e) => setSortBy(e.target.value)}>
+                  <option value="ASC_ORDER">Sorting items</option>
+                  <option value="HIGH_TO_LOW">High To Low</option>
+                  <option value="LOW_TO_HIGH">Low To High</option>
+                  <option value="NEWEST">Newest</option>
+                  <option value="ASC_ORDER">Asc Order</option>
+                  <option value="DESC_ORDER">Desc Order</option>
                 </select>
               </div>
             </div>
