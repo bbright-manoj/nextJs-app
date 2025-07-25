@@ -106,10 +106,7 @@ const ProductDetail: React.FC<ProductRightProps> = ({
       <h2>{item.name}</h2>
       {item.discount ? (
         <h2>
-          <span className="text-danger me-3">
-            - 
-            {item.getDiscount()}%
-          </span>
+          <span className="text-danger me-3">-{item.getDiscount()}%</span>
           <del className="text-muted ">
             M.R.P:{symbol}
             {item.getProductPrice() * value}
@@ -275,11 +272,13 @@ const ProductDetail: React.FC<ProductRightProps> = ({
         <span className="tags product-unipue mb--10">
           <strong>Type:</strong> original
         </span>
-        {item.brandName?? (
+        {item.brandName ? (
           <span className="tags product-unipue mb--10">
-            <strong>Brand Name:</strong>
+            <strong>Brand Name: </strong>
             {item.brandName}
           </span>
+        ) : (
+          <></>
         )}
       </div>
       <div className="border-product ">
@@ -290,7 +289,7 @@ const ProductDetail: React.FC<ProductRightProps> = ({
               onClick={() => {
                 addToWish(item);
               }}
-            > 
+            >
               <i className="fa fa-heart"></i>
               <span className="title-font ">Add To WishList</span>
             </button>

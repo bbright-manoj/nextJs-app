@@ -48,7 +48,7 @@ const Search: NextPage = () => {
       const hasResults =
         searchController.kits.length > 0 ||
         searchController.products.length > 0;
-      setShowResults(hasResults);
+      //setShowResults(hasResults);
       console.log("🔁 UI re-rendering from controller");
       forceUpdate(); // 💡 Ensure UI reflects changes
     };
@@ -121,23 +121,20 @@ const Search: NextPage = () => {
             </DropdownToggle>
             <DropdownMenu>
               {/* <DropdownItem key="all">{t("All Category")}</DropdownItem> */}
-              {allCategories.map(
-                (cat) =>
-                  cat.category_products.length ?? (
-                    <DropdownItem
-                      key={cat.id}
-                      className="custom-dropdown-item"
-                      onClick={() =>
-                        router.push(
-                          `/collections/no-sidebar?id=${cat.id}&type=category`
-                        )
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      {cat.name}
-                    </DropdownItem>
-                  )
-              )}
+              {allCategories.map((cat) => (
+                <DropdownItem
+                  key={cat.id}
+                  className="custom-dropdown-item"
+                  onClick={() =>
+                    router.push(
+                      `/collections/no-sidebar?id=${cat.id}&type=category`
+                    )
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  {cat.name}
+                </DropdownItem>
+              ))}
             </DropdownMenu>
           </ButtonDropdown>
         </InputGroupText>
