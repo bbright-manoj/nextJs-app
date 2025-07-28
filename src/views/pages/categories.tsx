@@ -3,9 +3,9 @@ import { NextPage } from "next";
 import { Media, Row, Col, Container } from "reactstrap";
 import Breadcrumb from "@/views/Containers/Breadcrumb";
 // Update this import path
-import { Category, objCache, searchController } from "@/app/globalProvider";
+import { Category, objCache } from "@/app/globalProvider";
 import { useRouter, useSearchParams } from "next/navigation";
-
+import PostLoader from "@/common/postLoader";
 import { FilterContext } from "@/helpers/filter/filter.context";
 
 // Define interfaces for type safety
@@ -33,24 +33,7 @@ const CategoryPage: NextPage = () => {
   const [grid, setGrid] = useState(cols);
   const [pageLimit, setPageLimit] = useState(50);
   const [layout, setLayout] = useState("");
-
-  // Use useMemo to avoid recalculating filtered categories on every render
-  const filteredCategories = useMemo(() => {
-    return query.trim()
-      ? Categories.filter((item) =>
-          item.name?.toLowerCase().includes(query.toLowerCase())
-        )
-      : Categories;
-  }, [query, Categories]);
-
-  const paginatedItems = useMemo(() => {
-    return filteredCategories.slice(
-      (currentPage - 1) * pageLimit,
-      currentPage * pageLimit
-    );
-  }, [filteredCategories, currentPage, pageLimit]);
-
-  const totalPages = Math.ceil(filteredCategories.length / pageLimit);
+  const [sortBy, setSortBy] = useState("ASC_ORDER");
 
   useEffect(() => {
     try {
@@ -79,6 +62,46 @@ const CategoryPage: NextPage = () => {
     setQuery(value);
     setCurrentPage(1);
   };
+
+  // Use useMemo to avoid recalculating filtered categories on every render
+  const filteredCategories = useMemo(() => {
+    return query.trim()
+      ? Categories.filter((item) =>
+          item.name?.toLowerCase().includes(query.toLowerCase())
+        )
+      : Categories;
+  }, [query, Categories]);
+
+  const totalPages = Math.ceil(filteredCategories.length / pageLimit);
+
+  const sortProducts = (products: any[], sortOption: string) => {
+    const sorted = [...products];
+    switch (sortOption) {
+      case "NEWEST":
+        return sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime()
+        );
+      case "DESC_ORDER":
+        return sorted.sort((a, b) => b.name?.localeCompare(a.name || "") || 0);
+      case "ASC_ORDER":
+      default:
+        return sorted.sort((a, b) => a.name?.localeCompare(b.name || "") || 0);
+    }
+  };
+
+  // Apply sorting and pagination
+  const sortedItems = useMemo(() => {
+    return sortProducts(filteredCategories, sortBy);
+  }, [filteredCategories, sortBy]);
+
+  const paginatedItems = useMemo(() => {
+    return sortedItems.slice(
+      (currentPage - 1) * pageLimit,
+      currentPage * pageLimit
+    );
+  }, [filteredCategories, currentPage, pageLimit]);
 
   if (loading) {
     return (
@@ -130,18 +153,6 @@ const CategoryPage: NextPage = () => {
 
       <div className="product-top-filter">
         <Row>
-          {/* <Col xs="12">
-            <div className="filter-main-btn">
-              <span
-                className="filter-btn"
-                onClick={() => {
-                  setLeftSidebarOpen(!leftSidebarOpen);
-                }}
-              >
-                <i className="fa fa-filter" aria-hidden="true"></i> Filter
-              </span>
-            </div>
-          </Col> */}
           <Col xs="12">
             <div className="product-filter-content">
               <div className="search-count">
@@ -152,7 +163,7 @@ const CategoryPage: NextPage = () => {
                         filteredCategories.length
                       )} of ${filteredCategories.length}`
                     : "loading"}{" "}
-                  Result
+                  Results
                 </h5>
               </div>
               <div className="collection-view">
@@ -205,26 +216,47 @@ const CategoryPage: NextPage = () => {
               </div>
               <div className="product-page-per-view">
                 <select
+                  name="pagination"
                   onChange={(e) => setPageLimit(parseInt(e.target.value))}
                 >
                   <option value="10" selected={pageLimit === 10}>
-                    10 Products Par Page
+                    10 Products per Page
                   </option>
 
                   <option value="20" selected={pageLimit === 20}>
-                    20 Products Par Page
+                    20 Products per Page
                   </option>
                   <option value="50" selected={pageLimit === 50}>
-                    50 Products Par Page
+                    50 Products per Page
                   </option>
                   <option value="100" selected={pageLimit === 100}>
-                    100 Products Par Page
+                    100 Products per Page
                   </option>
                   <option
                     value={filteredCategories.length}
                     selected={pageLimit === filteredCategories.length}
                   >
                     Show All
+                  </option>
+                </select>
+              </div>
+
+              <div className="product-page-filter">
+                <select
+                  name="filter"
+                  onChange={(e) => {
+                    setSortBy(e.target.value);
+                  }}
+                >
+                  <option value="">Sorting items</option>
+                  <option value="NEWEST" selected={sortBy === "NEWEST"}>
+                    Newest
+                  </option>
+                  <option value="ASC_ORDER" selected={sortBy === "ASC_ORDER"}>
+                    Asc Order
+                  </option>
+                  <option value="DESC_ORDER" selected={sortBy === "DESC_ORDER"}>
+                    Desc Order
                   </option>
                 </select>
               </div>
@@ -237,6 +269,7 @@ const CategoryPage: NextPage = () => {
         {/* Categories section */}
         <div className={`product-wrapper-grid ${layout}`}>
           <Row>
+            {loading && <PostLoader count={20} />}
             {paginatedItems.map((category) => (
               <div className={grid} key={category.id}>
                 <div

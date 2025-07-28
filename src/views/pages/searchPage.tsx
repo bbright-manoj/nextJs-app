@@ -143,7 +143,7 @@ const SearchPage: NextPage = () => {
   const defaultRangeSize = 100;
   const maxRanges = 5;
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
-  const paginatedItems = filteredItems.slice(...currentRange);
+
   const [sortBy, setSortBy] = useState("ASC_ORDER");
 
   const rangeOptions = useMemo(() => {
@@ -178,6 +178,40 @@ const SearchPage: NextPage = () => {
 
     setCurrentRange(selectedRange);
   };
+
+  const sortProducts = (products: any[], sortOption: string) => {
+    const sorted = [...products];
+    switch (sortOption) {
+      case "HIGH_TO_LOW":
+        return sorted.sort(
+          (a, b) => (b.getPrice?.() || 0) - (a.getPrice?.() || 0)
+        );
+      case "LOW_TO_HIGH":
+        return sorted.sort(
+          (a, b) => (a.getPrice?.() || 0) - (b.getPrice?.() || 0)
+        );
+      case "NEWEST":
+        return sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt || 0).getTime() -
+            new Date(a.createdAt || 0).getTime()
+        );
+      case "DESC_ORDER":
+        return sorted.sort((a, b) => b.name?.localeCompare(a.name || "") || 0);
+      case "ASC_ORDER":
+      default:
+        return sorted.sort((a, b) => a.name?.localeCompare(b.name || "") || 0);
+    }
+  };
+
+  // Apply sorting and pagination
+  const sortedItems = useMemo(() => {
+    return sortProducts(filteredItems, sortBy);
+  }, [filteredItems, sortBy]);
+
+  const paginatedItems = useMemo(() => {
+    return sortedItems.slice(...currentRange);
+  }, [sortedItems, currentRange]);
 
   return (
     <>
@@ -231,7 +265,7 @@ const SearchPage: NextPage = () => {
                   {filteredItems
                     ? `Showing Products ${currentRange[0]}-${currentRange[1]} of ${filteredItems.length}`
                     : "loading"}{" "}
-                  Result
+                  Results
                 </h5>
               </div>
               <div className="collection-view">
@@ -259,7 +293,7 @@ const SearchPage: NextPage = () => {
                 className="collection-grid-view d-sm-none d-lg-block"
                 style={layout === "list-view" ? { opacity: 0 } : { opacity: 1 }}
               >
-                <ul>
+                <ul className="d-sm-none d-lg-block">
                   <li onClick={() => setGrid("col-lg-6 col-sm-6")}>
                     <img
                       src="/images/category/icon/2.png"
@@ -284,7 +318,7 @@ const SearchPage: NextPage = () => {
                 </ul>
               </div>
               <div className="product-page-per-view">
-                <select onChange={handleRangeChange}>
+                <select name="pagination" onChange={handleRangeChange}>
                   {rangeOptions.map((option, index) => (
                     <option key={index} value={option.label}>
                       {option.label}
@@ -293,13 +327,32 @@ const SearchPage: NextPage = () => {
                 </select>
               </div>
               <div className="product-page-filter">
-                <select onChange={(e) => setSortBy(e.target.value)}>
-                  <option value="ASC_ORDER">Sorting items</option>
-                  <option value="HIGH_TO_LOW">High To Low</option>
-                  <option value="LOW_TO_HIGH">Low To High</option>
-                  <option value="NEWEST">Newest</option>
-                  <option value="ASC_ORDER">Asc Order</option>
-                  <option value="DESC_ORDER">Desc Order</option>
+                <select
+                  name="filter"
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="">Sorting items</option>
+                  <option
+                    value="HIGH_TO_LOW"
+                    selected={sortBy === "HIGH_TO_LOW"}
+                  >
+                    High To Low
+                  </option>
+                  <option
+                    value="LOW_TO_HIGH"
+                    selected={sortBy === "LOW_TO_HIGH"}
+                  >
+                    Low To High
+                  </option>
+                  <option value="NEWEST" selected={sortBy === "NEWEST"}>
+                    Newest
+                  </option>
+                  <option value="ASC_ORDER" selected={sortBy === "ASC_ORDER"}>
+                    Asc Order
+                  </option>
+                  <option value="DESC_ORDER" selected={sortBy === "DESC_ORDER"}>
+                    Desc Order
+                  </option>
                 </select>
               </div>
             </div>
@@ -307,7 +360,7 @@ const SearchPage: NextPage = () => {
         </Row>
       </div>
 
-      <section className="section-big-py-space ratio_asos bg-light">
+      <section className="section-big-py-space ratio_asos">
         <div className="custom-container">
           <div className="row search-product related-pro1">
             <div

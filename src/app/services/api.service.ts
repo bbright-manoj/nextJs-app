@@ -501,7 +501,7 @@ private async ensureBusinessId(): Promise<string> {
           tenant_id: this.tenantId,
         }
       );
-      console.log("All Products Response:", response);
+
       // return response.data;
       const allProducts = new Map<CategoryRender, Product[]>();
       for (const element of response.data) {

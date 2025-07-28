@@ -28960,7 +28960,7 @@ select {
 .product-top-filter .product-filter-content .sidebar-popup,
 .product-top-filter .popup-filter .search-count,
 .collection-product-wrapper .product-top-filter .popup-filter .sidebar-popup {
-  border-right: 1px solid #dddddd;
+  border: 1px solid #dddddd;
   padding: 20px;
   text-transform: capitalize;
   width: 35%;
@@ -28971,6 +28971,7 @@ select {
 .product-top-filter .popup-filter .collection-view {
   padding: 20px;
   width: 10%;
+  border: solid 1px #dddddd;
   ul li {
     margin-right: 10px;
   }
@@ -28979,7 +28980,7 @@ select {
 .product-top-filter .popup-filter .collection-grid-view {
   padding: 20px;
   width: 20%;
-  border-right: 1px solid #dddddd;
+  border: 1px solid #dddddd;
 }
 
 .product-top-filter .product-filter-content .product-page-per-view,
@@ -28991,7 +28992,7 @@ select {
   select {
     border: 0;
     padding: 20px;
-    border-right: 1px solid #dddddd;
+    border: 1px solid #dddddd;
     width: 100%;
     -webkit-appearance: none;
     -moz-appearance: none;
@@ -29031,14 +29032,14 @@ select {
 @media (max-width: 1470px) {
   .product-top-filter .product-filter-content .search-count {
     width: 100%;
-    border-left: 1px solid #dddddd;
+    border: 1px solid #dddddd;
     border-bottom: 1px solid #dddddd;
     text-align: center;
   }
   .product-top-filter .product-filter-content .collection-view {
     width: 20%;
     padding-right: 0 !important;
-    border-left: 1px solid #dddddd;
+    border: 1px solid #dddddd;
   }
 
   .product-top-filter .product-filter-content .collection-grid-view {
@@ -31262,6 +31263,10 @@ li a:hover .category-name {
   margin-top: 15px;
 }
 
+.col-grid-box{
+  margin:10px 0;
+}
+
 /* Responsive Styles */
 
 /* Large Tablets and Small Desktops */
@@ -31386,7 +31391,7 @@ li a:hover .category-name {
     font-size: 3rem;
   }
   .product-top-filter .product-filter-content .product-page-per-view {
-    width: 52%;
+    width: 50%;
   }
   .search-count h5 {
     font-size: 14px;

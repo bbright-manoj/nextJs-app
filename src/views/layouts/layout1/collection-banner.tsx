@@ -33,9 +33,7 @@ const CollectionBanner: NextPage<Props> = ({
     router.push(`/product-details/${id}`);
   };
 
-  console.log(categories);
-
-  if (categories.length) {
+  if (categories?.length) {
     return (
       <>
         <section className="w-full rts-category-area section-pt-space">
