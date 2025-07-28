@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { NextPage } from "next";
 import { useForm } from "react-hook-form";
 import { Form, Row, Col } from "reactstrap";
@@ -7,12 +7,14 @@ import Breadcrumb from "../../../views/Containers/Breadcrumb";
 import { CartContext } from "../../../helpers/cart/cart.context";
 import { useRouter } from "next/navigation";
 import { CurrencyContext } from "@/helpers/currency/CurrencyContext";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
+// import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import { toast } from "react-toastify";
 import { API } from "@/app/services/api.service";
 import { searchController } from "@/app/globalProvider";
 import { Kit } from "@/app/models/kit/kit";
-
+import { RazorpayModel } from "@/app/models/razorpay_model/razorpay";
+import Store from "@/app/(MainBody)/pages/store/page";
+import { appConfig } from "@/app/globalProvider";
 // Simple OrderModel wrapper to match your API structure
 class OrderModel {
   private orderData: any;
@@ -44,12 +46,15 @@ interface KitRaw {
 }
 
 // PayPal configuration
-const paypalOptions = {
-  clientId: "AZ4S98zFa01vym7NVeo_qthZyOnBhtNvQDsjhaZSMH-2_Y9IAJFbSD3HPueErYqN8Sa8WYRbjP7wWtd_",
-  currency: "USD",
-  intent: "capture"
-};
+// const paypalOptions = {
+//   clientId: "AZ4S98zFa01vym7NVeo_qthZyOnBhtNvQDsjhaZSMH-2_Y9IAJFbSD3HPueErYqN8Sa8WYRbjP7wWtd_",
+//   currency: "USD",
+//   intent: "capture"
+// };
+// declare const Razorpay: any;
 
+
+  
 // Static order data template
 const createStaticOrderData = (formData: formType, paymentMethod: string, cartItems: any[], totals: any) => {
   const currentTime = new Date().toISOString();
@@ -59,7 +64,7 @@ const createStaticOrderData = (formData: formType, paymentMethod: string, cartIt
     "id": `STEAKSSTAY-E${orderNumber}`,
     "img": [],
     "store": "store",
-    "store_id": "5e2f938f-5d53-4f33-bfd1-1248acec2fc7",
+    "store_id": appConfig.defaultStoreId,
     "order_gst": "",
     "tax_group": {},
     "tax_total": totals.tax,
@@ -92,20 +97,12 @@ const createStaticOrderData = (formData: formType, paymentMethod: string, cartIt
       "order_kit_items": [],
       "sale_quantity_str": `${item.qty || 1}kg`,
       "base_choosed_price": totals.itemPrice * (item.qty || 1),
-      "selected_subscription": {
-        "end_date": currentTime,
-        "interval": 1,
-        "start_date": currentTime,
-        "time_slots": ["MORNING", "EVENING"],
-        "selected_months": ["JAN", "FEB"],
-        "selected_weekdays": ["MON", "THU", "SAT"],
-        "subscription_type": "DAILY"
-      }
+      "selected_subscription": null
     })),
     "txn_details": {},
     "device_token": "",
     "package_cost": 5,
-    "payment_mode": paymentMethod === "cod" ? "Cash On Delivery" : "PayPal",
+    "payment_mode": paymentMethod === "cod" ? "Cash On Delivery" : paymentMethod === "razorpay" ? "Razorpay" : "razorpay",
     "phone_number": formData.phone,
     "coupon_amount": 0,
     "creation_time": currentTime,
@@ -143,10 +140,39 @@ const CheckoutPageContent: React.FC = () => {
   const router = useRouter();
   const { selectedCurr } = useContext(CurrencyContext);
   const { symbol, value } = selectedCurr;
-  const { cartItems, emptyCart } = useContext(CartContext);
-  
+  const { cartItems, emptyCart } = useContext(CartContext);  
   const [payment, setPayment] = useState("cod");
   const [isProcessingOrder, setIsProcessingOrder] = useState(false);
+  const [razorpayKey, setRazorpayKey] = useState<string | null>(null);
+ useEffect(() => {
+  const loadRazorpayScript = async () => {
+    try {
+      // 1. First fetch the Razorpay key
+      const apidata = await API.getRazorPayDetails();
+      console.log("API response for Razorpay config:", apidata);
+      
+      if (apidata.length > 0) {
+        setRazorpayKey(apidata[0].keyId);
+        
+        // 2. Now load the Razorpay script
+        const script = document.createElement('script');
+        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+        script.async = true;
+        script.onerror = () => {
+          toast.error("Failed to load Razorpay script");
+        };
+        document.body.appendChild(script);
+      } else {
+        toast.error("No Razorpay config found");
+      }
+    } catch (err) {
+      console.error("Failed to load Razorpay config", err);
+      toast.error("Failed to load payment gateway config");
+    }
+  };
+
+  loadRazorpayScript();
+}, []);
 
   const {
     register,
@@ -154,7 +180,7 @@ const CheckoutPageContent: React.FC = () => {
     formState: { errors },
     getValues
   } = useForm<formType>();
-
+   
   // Price function from cart page - exact implementation
   const getProductById = (productId: string): any => {
     if (!productId) return null;
@@ -439,57 +465,170 @@ const CheckoutPageContent: React.FC = () => {
     }
   };
 
-  const onPayPalSuccess = (data: any, actions: any) =>
-    actions.order.capture().then(async (paymentDetails: any) => {
-      setIsProcessingOrder(true);
+  // const onPayPalSuccess = (data: any, actions: any) =>
+  //   actions.order.capture().then(async (paymentDetails: any) => {
+  //     setIsProcessingOrder(true);
       
-      try {
-        // Validate cart items
-        validateCartItems();
+  //     try {
+  //       // Validate cart items
+  //       validateCartItems();
         
-        const formData = getValues();
-        const totals = {
-          subtotal: subtotal,
-          tax: taxAmount,
-          final: finalTotal,
-          itemPrice: getPrice(cartItems[0])
-        };
+  //       const formData = getValues();
+  //       const totals = {
+  //         subtotal: subtotal,
+  //         tax: taxAmount,
+  //         final: finalTotal,
+  //         itemPrice: getPrice(cartItems[0])
+  //       };
         
-        const orderData = createStaticOrderData(formData, "paypal", cartItems, totals);
+  //       const orderData = createStaticOrderData(formData, "paypal", cartItems, totals);
         
-        // Add PayPal transaction details
-        orderData.txn_details = {
-          paypal_payment_id: data.id,
-          paypal_order_id: data.id,
-          payment_details: paymentDetails
-        };
+  //       // Add PayPal transaction details
+        // orderData.txn_details = {
+  //         paypal_payment_id: data.id,
+  //         paypal_order_id: data.id,
+  //         payment_details: paymentDetails
+  //       };
         
-        const response = await submitOrder(orderData);
+        // const response = await submitOrder(orderData);
         
-        const orderSuccessData = {
-          orderId: orderData.id,
-          items: cartItems,
-          total: finalTotal,
-          paymentMethod: "paypal",
-          paymentId: data.id,
-          orderDate: new Date().toISOString(),
-          status: "completed",
-          apiResponse: response
-        };
+  //       const orderSuccessData = {
+  //         orderId: orderData.id,
+  //         items: cartItems,
+  //         total: finalTotal,
+  //         paymentMethod: "paypal",
+  //         paymentId: data.id,
+  //         orderDate: new Date().toISOString(),
+  //         status: "completed",
+  //         apiResponse: response
+  //       };
         
-        sessionStorage.setItem("order-success-data", JSON.stringify(orderSuccessData));
+  //       sessionStorage.setItem("order-success-data", JSON.stringify(orderSuccessData));
         
-        emptyCart();
-        toast.success("Payment successful!");
-        router.push("/pages/order-success");
+  //       emptyCart();
+  //       toast.success("Payment successful!");
+  //       router.push("/pages/order-success");
         
-      } catch (error) {
-        console.error("PayPal order processing error:", error);
-        toast.error(error.message || "Error processing order. Please try again.");
-      } finally {
-        setIsProcessingOrder(false);
+  //     } catch (error) {
+  //       console.error("PayPal order processing error:", error);
+  //       toast.error(error.message || "Error processing order. Please try again.");
+  //     } finally {
+  //       setIsProcessingOrder(false);
+  //     }
+  //   });
+  const initiateRazorpayPayment = async () => {
+  if (!razorpayKey) {
+    toast.error("Payment gateway not ready");
+    return;
+  }
+  
+  setIsProcessingOrder(true);
+
+  try {
+    // 1. Validate everything first
+    const formData = getValues();
+    validateCartItems();
+    
+    if (finalTotal <= 0) {
+      throw new Error("Invalid order total");
+    }
+
+    // 2. Prepare order data
+    const totals = {
+      subtotal,
+      tax: taxAmount,
+      final: finalTotal,
+      itemPrice: getPrice(cartItems[0])
+    };
+    
+    const orderData = createStaticOrderData(formData, "razorpay", cartItems, totals);
+
+    // 3. Create Razorpay order details
+    const razorpayOrder = {
+      id: orderData.id,
+      currency: "INR",
+      amount: finalTotal * 100, // Razorpay expects amount in paise
+      receipt: `receipt_${Date.now()}`
+    };
+
+    // 4. Create complete Razorpay config with handler
+    const razorpayConfig = {
+      key: razorpayKey,
+      amount: razorpayOrder.amount,
+      currency: "INR",
+      name: "Your Store Name",
+      description: "Order Payment",
+      order_id: razorpayOrder.id,
+      handler: function (response: any) {
+        try {
+          // Save payment details
+          orderData.txn_details = {
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            verification: true
+          };
+          
+          submitOrder(orderData).then(() => {
+            const orderSuccessData = {
+              orderId: orderData.id,
+              items: cartItems,
+              total: finalTotal,
+              subtotal,
+              tax: taxAmount,
+              paymentMethod: "razorpay",
+              paymentId: response.razorpay_payment_id,
+              orderDate: new Date().toISOString(),
+              status: "completed"
+            };
+
+            sessionStorage.setItem("order-success-data", JSON.stringify(orderSuccessData));
+            emptyCart();
+            router.push("/pages/order-success");
+          });
+        } catch (error) {
+          console.error("Payment processing error:", error);
+          toast.error(error.message || "Payment processing failed");
+        }
+      },
+      prefill: {
+        name: `${formData.firstName} ${formData.lastName}`,
+        email: formData.email,
+        contact: formData.phone
+      },
+      notes: {
+        address: formData.address,
+        merchant_order_id: `order_${Date.now()}`
+      },
+      theme: {
+        color: "#3399cc"
+      },
+      modal: {
+        ondismiss: () => {
+          toast.info("Payment window closed");
+        }
       }
+    };
+
+    // 5. Initialize Razorpay
+    const rzp = new window.Razorpay(razorpayConfig);
+
+    // 6. Handle failed payment
+    rzp.on('payment.failed', (response: any) => {
+      toast.error(`Payment failed: ${response.error.description}`);
+      console.error("Payment failed:", response);
     });
+
+    // Open payment modal
+    rzp.open();
+    
+  } catch (error) {
+    console.error("Razorpay initialization error:", error);
+    toast.error(error.message || "Payment initialization failed");
+  } finally {
+    setIsProcessingOrder(false);
+  }
+};
 
   // Helper function to get unique identifier for item
   const getItemKey = (item: any): string => {
@@ -675,7 +814,7 @@ const CheckoutPageContent: React.FC = () => {
                         <label>Cash on Delivery (COD)</label>
                       </div>
                       
-                      <div 
+                      {/* <div 
                         className={`payment-option ${payment === 'paypal' ? 'selected' : ''}`}
                         onClick={() => setPayment('paypal')}
                       >
@@ -687,7 +826,20 @@ const CheckoutPageContent: React.FC = () => {
                           onChange={(e) => setPayment(e.target.value)}
                         />
                         <label>Online Payment</label>
-                      </div>
+                      </div> */}
+                      <div 
+                        className={`payment-option ${payment === 'razorpay' ? 'selected' : ''}`}
+                        onClick={() => setPayment('razorpay')}
+                      >
+                        <input
+                          type="radio"
+                          name="payment"
+                          value="razorpay"
+                          checked={payment === 'razorpay'}
+                          onChange={(e) => setPayment(e.target.value)}
+                        />
+                        <label>Razorpay Payment</label>
+                      </div>                    
                     </div>
                   </div>
                 </Col>
@@ -753,26 +905,44 @@ const CheckoutPageContent: React.FC = () => {
                         {isProcessingOrder ? "Processing..." : "Place Order"}
                       </button>
                     ) : (
-                      <div className="paypal-container">
-                        <PayPalButtons
-                          createOrder={(data, actions) => {
-                            return actions.order.create({
-                              purchase_units: [{
-                                amount: {
-                                  value: finalTotal.toFixed(2),
-                                  currency_code: "USD"
-                                }
-                              }],
-                              intent: "CAPTURE"
-                            });
-                          }}
-                          onApprove={onPayPalSuccess}
-                          onCancel={() => toast.error("Payment cancelled")}
-                          onError={(err) => {
-                            console.error("PayPal error:", err);
-                            toast.error("Payment error occurred");
-                          }}
-                        />
+                      // <div className="paypal-container">
+                      //   <PayPalButtons
+                      //     createOrder={(data, actions) => {
+                      //       return actions.order.create({
+                      //         purchase_units: [{
+                      //           amount: {
+                      //             value: finalTotal.toFixed(2),
+                      //             currency_code: "USD"
+                      //           }
+                      //         }],
+                      //         intent: "CAPTURE"
+                      //       });
+                      //     }}
+                      //     onApprove={onPayPalSuccess}
+                      //     onCancel={() => toast.error("Payment cancelled")}
+                      //     onError={(err) => {
+                      //       console.error("PayPal error:", err);
+                      //       toast.error("Payment error occurred");
+                      //     }}
+                      //   />
+                      <div className="razorpay-button-container">
+                        <button
+                          type="button" 
+                          className="btn-primary"
+                          onClick={initiateRazorpayPayment}
+                          disabled={isProcessingOrder}
+                        >
+                          {isProcessingOrder ? (
+                            <>
+                              <span className="spinner-border spinner-border-sm me-2"></span>
+                              Processing...
+                            </>
+                          ) : (
+                            <span>
+                              Pay with Razorpay ({symbol}{finalTotal.toFixed(2)})
+                            </span>
+                          )}
+                        </button>
                       </div>
                     )}
                   </div>
@@ -785,13 +955,15 @@ const CheckoutPageContent: React.FC = () => {
     </>
   );
 };
-
+// const CheckoutPage: NextPage = () => {
+//   return (
+//     <PayPalScriptProvider options={paypalOptions}>
+//       <CheckoutPageContent />
+//     </PayPalScriptProvider>
+//   );
+// };
 const CheckoutPage: NextPage = () => {
-  return (
-    <PayPalScriptProvider options={paypalOptions}>
-      <CheckoutPageContent />
-    </PayPalScriptProvider>
-  );
+  return <CheckoutPageContent />;
 };
 
 export default CheckoutPage;

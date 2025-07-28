@@ -53,6 +53,7 @@ export class APIService {
   private axiosInstance = axios.create();
   private tenantId: string;
   private storeId: string;
+  private businessId: string | null = null;
   baseURL: string;
   appName: string;
 
@@ -74,11 +75,19 @@ export class APIService {
     NotificationService.initialize();
   }
 
+private async ensureBusinessId(): Promise<string> {
+  if (!this.businessId) {
+    const details = await this.getBusinessDetails();
+    this.businessId = details.id;
+  }
+  return this.businessId;
+}
+
   public setCurrentStore(storeId: string): void {
     this.storeId = storeId;
     ClientStorage.setItem("currentStoreId", storeId);
   }
-
+  
   public getCurrentStoreId(): string {
     return (
       (this.storeId ? this.storeId : ClientStorage.getItem("currentStoreId")) ||
@@ -779,7 +788,7 @@ export class APIService {
       const payload = {
         tenant_id: this.tenantId,
         doc: {
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
           store_id: this.storeId,
           log_code: code,
           log_count: 0, // You might want to track this properly
@@ -1008,7 +1017,7 @@ export class APIService {
         `${this.baseURL}/get-app-credits`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1029,7 +1038,7 @@ export class APIService {
         `${this.baseURL}/get-returns-refund`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1050,7 +1059,7 @@ export class APIService {
         `${this.baseURL}/get-privacy`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1071,7 +1080,7 @@ export class APIService {
         `${this.baseURL}/get-termsAndConditions`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1167,7 +1176,7 @@ export class APIService {
         `${this.baseURL}/get-razorpay`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1191,7 +1200,7 @@ export class APIService {
       throw error;
     }
   }
-
+  
   // Users
   async getUserData(): Promise<UserModel[]> {
     try {
@@ -1199,7 +1208,7 @@ export class APIService {
         `${this.baseURL}/get-users`,
         {
           tenant_id: this.tenantId,
-          business_id: (await this.getBusinessDetails()).id,
+          business_id: await this.ensureBusinessId(),
         }
       );
 
@@ -1253,7 +1262,7 @@ export class APIService {
         {
           tenant_id: this.tenantId,
           order_distance: distance,
-          delivery_setup_id: (await this.getBusinessDetails()).id,
+          delivery_setup_id: await this.ensureBusinessId(),
         }
       );
 
