@@ -23,9 +23,11 @@ interface EnrichedWishlistItem {
 
 const Wishlist: NextPage = () => {
   const [openWishlist, setOpenWishlist] = useState(false);
-  const [enrichedWishlistData, setEnrichedWishlistData] = useState<EnrichedWishlistItem[]>([]);
+  const [enrichedWishlistData, setEnrichedWishlistData] = useState<
+    EnrichedWishlistItem[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const { wishlistItems, removeFromWish } = useContext(WishlistContext);
   const { selectedCurr } = useContext(CurrencyContext);
   const { symbol, value } = selectedCurr;
@@ -49,15 +51,23 @@ const Wishlist: NextPage = () => {
 
       // Search in kits array with proper null checks
       if (searchController?.kits && Array.isArray(searchController.kits)) {
-        const kitRaw = searchController.kits.find((k: any) => k?.id === productId);
+        const kitRaw = searchController.kits.find(
+          (k: any) => k?.id === productId
+        );
         if (kitRaw) {
           return kitRaw;
         }
       }
 
       // Try getDetails as fallback with required eventName parameter
-      if (searchController?.getDetails && typeof searchController.getDetails === 'function') {
-        const found = searchController.getDetails(productId, 'wishlist-sidebar');
+      if (
+        searchController?.getDetails &&
+        typeof searchController.getDetails === "function"
+      ) {
+        const found = searchController.getDetails(
+          productId,
+          "wishlist-sidebar"
+        );
         if (found && typeof found === "object") {
           return found;
         }
@@ -71,40 +81,64 @@ const Wishlist: NextPage = () => {
 
   // ✅ Enhanced price extraction logic (same as wishlist page)
   const extractPriceFromObject = (obj: any): number => {
-    if (!obj || typeof obj !== 'object') return 0;
+    if (!obj || typeof obj !== "object") return 0;
 
     // Check standard price fields first
-    if ('price' in obj && typeof obj.price === 'number' && obj.price > 0) {
+    if ("price" in obj && typeof obj.price === "number" && obj.price > 0) {
       return obj.price;
     }
 
     // Check Kit-specific price fields
-    if ('kitPrice' in obj && typeof obj.kitPrice === 'number' && obj.kitPrice > 0) {
+    if (
+      "kitPrice" in obj &&
+      typeof obj.kitPrice === "number" &&
+      obj.kitPrice > 0
+    ) {
       return obj.kitPrice;
     }
 
     // Check for discount price (prioritize over original price)
-    if (obj.discountPrice && typeof obj.discountPrice === 'number' && obj.discountPrice > 0) {
+    if (
+      obj.discountPrice &&
+      typeof obj.discountPrice === "number" &&
+      obj.discountPrice > 0
+    ) {
       return obj.discountPrice;
     }
 
     // Check for sale price
-    if (obj.salePrice && typeof obj.salePrice === 'number' && obj.salePrice > 0) {
+    if (
+      obj.salePrice &&
+      typeof obj.salePrice === "number" &&
+      obj.salePrice > 0
+    ) {
       return obj.salePrice;
     }
 
     // Check for finalPrice
-    if (obj.finalPrice && typeof obj.finalPrice === 'number' && obj.finalPrice > 0) {
+    if (
+      obj.finalPrice &&
+      typeof obj.finalPrice === "number" &&
+      obj.finalPrice > 0
+    ) {
       return obj.finalPrice;
     }
 
     // Check for currentPrice
-    if (obj.currentPrice && typeof obj.currentPrice === 'number' && obj.currentPrice > 0) {
+    if (
+      obj.currentPrice &&
+      typeof obj.currentPrice === "number" &&
+      obj.currentPrice > 0
+    ) {
       return obj.currentPrice;
     }
 
     // Check for sellingPrice
-    if (obj.sellingPrice && typeof obj.sellingPrice === 'number' && obj.sellingPrice > 0) {
+    if (
+      obj.sellingPrice &&
+      typeof obj.sellingPrice === "number" &&
+      obj.sellingPrice > 0
+    ) {
       return obj.sellingPrice;
     }
 
@@ -119,7 +153,7 @@ const Wishlist: NextPage = () => {
     }
 
     setIsLoading(true);
-    
+
     try {
       const enrichedData = wishlistItems.map((item: any, index: number) => {
         const found = getProductById(item.productId);
@@ -128,23 +162,27 @@ const Wishlist: NextPage = () => {
         const enriched = found && typeof found === "object" ? found : {};
 
         // Extract price from found product or fallback to item price
-        const productPrice = extractPriceFromObject(enriched) || extractPriceFromObject(item) || item.price || 0;
+        const productPrice =
+          extractPriceFromObject(enriched) ||
+          extractPriceFromObject(item) ||
+          item.price ||
+          0;
 
         // Extract images with proper fallback
         const getImages = (obj: any): string[] => {
           if (obj?.img && Array.isArray(obj.img)) return obj.img;
           if (obj?.images && Array.isArray(obj.images)) return obj.images;
-          if (obj?.img && typeof obj.img === 'string') return [obj.img];
-          if (obj?.image && typeof obj.image === 'string') return [obj.image];
+          if (obj?.img && typeof obj.img === "string") return [obj.img];
+          if (obj?.image && typeof obj.image === "string") return [obj.image];
           return [""];
         };
 
         // Extract stock with proper fallback
         const getStock = (obj: any): number => {
-          if (typeof obj?.stock === 'number') return obj.stock;
-          if (typeof obj?.quantity === 'number') return obj.quantity;
-          if (typeof obj?.inventory === 'number') return obj.inventory;
-          if (typeof obj?.stockQuantity === 'number') return obj.stockQuantity;
+          if (typeof obj?.stock === "number") return obj.stock;
+          if (typeof obj?.quantity === "number") return obj.quantity;
+          if (typeof obj?.inventory === "number") return obj.inventory;
+          if (typeof obj?.stockQuantity === "number") return obj.stockQuantity;
           return 0;
         };
 
@@ -152,7 +190,12 @@ const Wishlist: NextPage = () => {
           uuid: item.uuid,
           productId: item.productId,
           variantId: item.variantId,
-          title: enriched.title || enriched.name || item.title || item.name || "Unnamed Product",
+          title:
+            enriched.title ||
+            enriched.name ||
+            item.title ||
+            item.name ||
+            "Unnamed Product",
           type: enriched.type || enriched.category || item.type || "General",
           img: getImages(enriched) || getImages(item),
           price: productPrice,
@@ -174,7 +217,7 @@ const Wishlist: NextPage = () => {
   // ✅ Enhanced remove from wishlist handler
   const handleRemoveFromWishlist = (item: EnrichedWishlistItem) => {
     try {
-      if (removeFromWish && typeof removeFromWish === 'function') {
+      if (removeFromWish && typeof removeFromWish === "function") {
         removeFromWish(item.originalItem);
       } else {
         console.error("removeFromWish function not available");
@@ -188,7 +231,7 @@ const Wishlist: NextPage = () => {
   const formatPrice = (price: number): string => {
     try {
       const convertedPrice = price * (value || 1);
-      return `${symbol || '$'}${convertedPrice.toFixed(2)}`;
+      return `${symbol || "$"}${convertedPrice.toFixed(2)}`;
     } catch (error) {
       console.error("Error formatting price:", error);
       return `$${price.toFixed(2)}`;
@@ -215,25 +258,33 @@ const Wishlist: NextPage = () => {
   return (
     <>
       {/* Mobile Wishlist Icon */}
-      <li className="mobile-wishlist" onClick={toggleWishlist}>
+      <li className="mobile-wishlist item-count" onClick={toggleWishlist}>
         <a>
           <i className="icon-heart"></i>
-          <div className="cart-item">
-            <div>
+          {/* <div className="cart-item">
+            { <div>
               {totalItem} {t("item")} <span>{t("wishlist")}</span>
-            </div>
-          </div>
+            </div> }
+          </div> */}
+          <div className="item-count-contain">{totalItem}</div>
         </a>
       </li>
 
       {/* Wishlist Sidebar */}
-      <div id="wishlist_side" className={`add_to_cart right ${openWishlist ? "open-side" : ""}`}>
+      <div
+        id="wishlist_side"
+        className={`add_to_cart right ${openWishlist ? "open-side" : ""}`}
+      >
         <div className="overlay" onClick={handleOverlayClick}></div>
         <div className="cart-inner">
           <div className="cart_top">
             <h3>My Wishlist</h3>
             <div className="close-cart" onClick={handleCloseClick}>
-              <button type="button" className="btn-close" aria-label="Close wishlist">
+              <button
+                type="button"
+                className="btn-close"
+                aria-label="Close wishlist"
+              >
                 <i className="fa fa-times" aria-hidden="true"></i>
               </button>
             </div>
@@ -249,58 +300,62 @@ const Wishlist: NextPage = () => {
           ) : enrichedWishlistData && enrichedWishlistData.length > 0 ? (
             <div className="cart_media">
               <ul className="cart_product">
-                {enrichedWishlistData.map((item: EnrichedWishlistItem, index: number) => (
-                  <li key={item.uuid || item.productId || index}>
-                    <div className="media">
-                      <Link href={`/product/${item.productId}`}>
-                        <Media 
-                          alt={item.title} 
-                          className="me-3" 
-                          src={item.img?.[0] || ""}
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = "";
-                          }}
-                        />
-                      </Link>
-                      <div className="media-body">
+                {enrichedWishlistData.map(
+                  (item: EnrichedWishlistItem, index: number) => (
+                    <li key={item.uuid || item.productId || index}>
+                      <div className="media">
                         <Link href={`/product/${item.productId}`}>
-                          <h4 title={item.title}>
-                            {item.title.length > 30 ? `${item.title.substring(0, 30)}...` : item.title}
-                          </h4>
+                          <Media
+                            alt={item.title}
+                            className="me-3"
+                            src={item.img?.[0] || ""}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = "";
+                            }}
+                          />
                         </Link>
-                        <h4 className="theme-color">
-                          <span>{item.type}</span>
-                        </h4>
-                        <h5>
-                          <span>{formatPrice(item.price)}</span>
-                        </h5>
-                        {item.stock <= 0 && (
-                          <small className="text-muted">Out of Stock</small>
-                        )}
+                        <div className="media-body">
+                          <Link href={`/product/${item.productId}`}>
+                            <h4 title={item.title}>
+                              {item.title.length > 30
+                                ? `${item.title.substring(0, 30)}...`
+                                : item.title}
+                            </h4>
+                          </Link>
+                          <h4 className="theme-color">
+                            <span>{item.type}</span>
+                          </h4>
+                          <h5>
+                            <span>{formatPrice(item.price)}</span>
+                          </h5>
+                          {item.stock <= 0 && (
+                            <small className="text-muted">Out of Stock</small>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                    <div className="close-circle">
-                      <button
-                        type="button"
-                        className="btn btn-link"
-                        onClick={() => handleRemoveFromWishlist(item)}
-                        title="Remove from wishlist"
-                        aria-label="Remove from wishlist"
-                      >
-                        <i className="ti-trash" aria-hidden="true"></i>
-                      </button>
-                    </div>
-                  </li>
-                ))}
+                      <div className="close-circle">
+                        <button
+                          type="button"
+                          className="btn btn-link"
+                          onClick={() => handleRemoveFromWishlist(item)}
+                          title="Remove from wishlist"
+                          aria-label="Remove from wishlist"
+                        >
+                          <i className="ti-trash" aria-hidden="true"></i>
+                        </button>
+                      </div>
+                    </li>
+                  )
+                )}
               </ul>
 
               {/* Wishlist Footer Button */}
               <ul className="cart_total">
                 <li>
                   <div className="buttons">
-                    <Link 
-                      href="/pages/account/wishlist" 
+                    <Link
+                      href="/pages/account/wishlist"
                       className="btn btn-normal btn-block view-cart"
                       onClick={() => setOpenWishlist(false)}
                     >
@@ -312,14 +367,14 @@ const Wishlist: NextPage = () => {
             </div>
           ) : (
             <div className="empty-cart-cls text-center">
-              <img 
-                src="/images/empty-wishlist.png" 
-                className="img-fluid mb-4" 
+              <img
+                src="/images/empty-wishlist.png"
+                className=" mb-4"
                 alt="empty wishlist"
                 style={{ maxWidth: 200 }}
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
+                  target.style.display = "none";
                 }}
               />
               <h3>
@@ -327,8 +382,8 @@ const Wishlist: NextPage = () => {
               </h3>
               <h4>Explore more and shortlist some items.</h4>
               <div className="mt-3">
-                <Link 
-                  href="/collections/leftsidebar" 
+                <Link
+                  href="/collections/leftsidebar"
                   className="btn btn-primary btn-sm"
                   onClick={() => setOpenWishlist(false)}
                 >

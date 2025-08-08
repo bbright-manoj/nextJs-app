@@ -17,7 +17,7 @@ const ThumbnailLeft: NextPage = () => {
         <section className="section-big-pt-space bg-light">
           <KitDetails />
           {kitId && <RelatedKits kitId={kitId} />}
-        </section>       
+        </section>
       </Layout1>
     </div>
   );

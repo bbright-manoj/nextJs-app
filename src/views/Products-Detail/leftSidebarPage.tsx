@@ -9,57 +9,114 @@ import ProductSlick from "../../views/Products-Detail/product-slick";
 import { gql } from "@apollo/client";
 import { useQuery } from "@apollo/client";
 import { FilterContext } from "@/helpers/filter/filter.context";
-import { Category, Discount, DiscountItem, objCache } from "@/app/globalProvider";
+import {
+  Category,
+  Discount,
+  DiscountItem,
+  objCache,
+} from "@/app/globalProvider";
 
 interface LeftSidebar {
   pathId: any;
 }
 
-var data:any;
+var data: any;
 const LeftSidebarPage: NextPage<LeftSidebar> = ({ pathId }) => {
   const filterContext = useContext(FilterContext);
   const { filterOpen, setFilterOpen } = filterContext;
   const [discount, setDiscount] = useState<DiscountItem>();
   const [productData, setProductData] = useState<any>();
-  
+
   var foundDiscount;
   useEffect(() => {
-   data = objCache.findProductById(pathId);
-   
+    data = objCache.findProductById(pathId);
+
     setProductData(data);
   }, []);
-console.log(data);
+
   return (
     <div className="collection-wrapper">
       {productData && (
         <div className="custom-container">
           <Row>
-            <Col
-              sm="3"
-              className="collection-filter"
-              style={{
-                left: filterOpen ? "-15px" : "",
-              }}>
-              <Sidebar />
-              <ProductService />
-              <NewProduct />
-            </Col>
-            <Col sm="12" lg="9" xs="12">
+            <Col sm="12" lg="12" xs="12" xl="9">
               <Row>
                 <Col xl="12">
+                  <div
+                    className={`menu-overlay ${filterOpen ? "active" : ""}`}
+                    onClick={() => {
+                      setFilterOpen(!filterOpen);
+                      document.body.style.overflow = "visible";
+                    }}
+                  ></div>
                   <div className="filter-main-btn mb-sm-4">
-                    <span className="filter-btn" onClick={() => setFilterOpen(!filterOpen)}>
+                    <span
+                      className="filter-btn"
+                      onClick={() => setFilterOpen(!filterOpen)}
+                    >
                       <i className="fa fa-filter" aria-hidden="true"></i> filter
                     </span>
                   </div>
                 </Col>
               </Row>
               <Row>
-                <ProductSlick item={productData} bundle={false} swatch={false} />
+                <Col>
+                  <ProductSlick
+                    item={productData}
+                    bundle={false}
+                    swatch={false}
+                  />
+                </Col>
               </Row>
-              <TabProduct description={productData.description?productData.description[0].description:''}/>
+              <TabProduct
+                description={
+                  productData.description
+                    ? productData.description[0].description
+                    : ""
+                }
+              />
+            </Col>
+            <Col
+              sm="12"
+              lg="12"
+              xs="12"
+              xl="3"
+              className="collection-filter"
+              style={{
+                left: filterOpen ? "-15px" : "",
+              }}
+            >
+              <Row>
+                {/* <Sidebar /> */}
+                <Col sm="6" lg="6" xs="12" xl="12">
+                  <ProductService />
+                </Col>
+                <Col sm="6" lg="6" xs="12" xl="12">
+                  <NewProduct />
+                </Col>
+              </Row>
             </Col>
           </Row>
+          {/* <Row>
+            <Col
+              lg="12"
+              className="collection-filter "
+              style={{
+                left: filterOpen ? "-15px" : "",
+              }}>
+              <Row>
+                
+                <Col lg="6">
+                  <ProductService />
+                </Col>
+                <Col lg="6">
+                  <NewProduct />
+                </Col>
+              </Row>
+            </Col>
+
+
+          </Row> */}
         </div>
       )}
     </div>

@@ -90,10 +90,10 @@ const Footer: NextPage = () => (
                       <div className="footer-contant">
                         <ul>
                           <li>
-                            <a href="#">about us</a>
+                            <a onClick={() => router.push("/pages/about-us")} style={{ cursor: "pointer" }}>About Us</a>
                           </li>
                           <li>
-                            <a href="#">contact us</a>
+                            <a onClick={() => router.push("/pages/ContactUs")} style={{ cursor: "pointer" }}>contact us</a>
                           </li>
                          <li>
                             <a onClick={() => router.push("/pages/terms")} style={{ cursor: "pointer" }}>terms & conditions</a>
@@ -119,10 +119,10 @@ const Footer: NextPage = () => (
                       <div className="footer-contant">
                         <ul>
                           <li>
-                            <a href="#">store location</a>
+                            <a onClick={() => router.push("/pages/store")} style={{ cursor: "pointer" }}>Store Location</a>
                           </li>
                           <li>
-                            <a href="#"> my account</a>
+                            <a onClick={() => router.push("/pages/account/profile")} style={{ cursor: "pointer" }}> my account</a>
                           </li>
                           <li>
                             <a href="#"> orders tracking</a>

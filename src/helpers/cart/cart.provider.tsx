@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { CartContext } from "./cart.context";
-import { product } from "../interfaces/product";
+import { CartContext, CartItem } from "./cart.context";
 import { toast } from "react-toastify";
 import { v4 as uuidv4 } from "uuid";
 
@@ -14,7 +13,7 @@ const getLocalCartItems = () => {
 };
 
 export const CartProvider = (props: any) => {
-  const [cartItems, setCartItems] = useState<product[]>(getLocalCartItems());
+  const [cartItems, setCartItems] = useState<CartItem[]>(getLocalCartItems());
   const [cartTotal, setCartTotal] = useState(0);
 
   useEffect(() => {
@@ -28,19 +27,74 @@ export const CartProvider = (props: any) => {
     localStorage.setItem("cartList", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (item: any) => {
-    toast.success("Product Added to Cart Successfully!");
+  // Check if product is already in cart
+  const isProductInCart = (productId: string): boolean => {
+    return cartItems.some(
+      (item) =>
+        item.id === productId ||
+        item.productId === productId ||
+        item.key === productId
+    );
+  };
 
-    const newItem = {
+  // Get product quantity from cart
+  const getProductQuantity = (productId: string): number => {
+    const item = cartItems.find(
+      (item) =>
+        item.id === productId ||
+        item.productId === productId ||
+        item.key === productId
+    );
+    return item ? item.qty : 0;
+  };
+
+  // Find existing product in cart
+  const findExistingProduct = (item: any) => {
+    return cartItems.find(
+      (cartItem) =>
+        //cartItem.id === item.id ||
+        cartItem.cartItemId === item.id
+      //cartItem.productId === item.id
+    );
+  };
+
+  // Find cart item helper
+  const findCartItem = (item: any): CartItem | undefined => {
+    return findExistingProduct(item);
+  };
+
+  const addToCart = (item: any, quantity: number = 1): boolean => {
+    console.log("Adding to cart:", item, "Quantity:", quantity);
+    const existingProduct = findExistingProduct(item);
+
+    if (existingProduct) {
+      // Product already exists, update quantity instead of adding new
+      const newQuantity = existingProduct.qty + quantity;
+      updateQty(existingProduct, newQuantity);
+      toast.success(
+        `Product quantity updated! Now ${newQuantity} items in cart`
+      );
+      return true;
+    }
+
+    // Product doesn't exist, add it to cart with specified quantity
+
+    const newItem: CartItem = {
       ...item,
-      qty: 1,
-      cartItemId: uuidv4(),
+      qty: quantity,
+      cartItemId: item.id,
+      // Ensure we have a consistent identifier
+      id: item.id,
+      //key: item.key || item.id,
     };
 
     setCartItems((prev) => [...prev, newItem]);
+    console.log(cartItems, existingProduct);
+    toast.success(`${quantity} item(s) added to cart!`);
+    return true;
   };
 
-  const updateQty = (item: any, quantity: number) => {
+  const updateQty = (item: CartItem, quantity: number): boolean => {
     if (quantity >= 1) {
       setCartItems((prev) =>
         prev.map((cartItem) =>
@@ -53,16 +107,19 @@ export const CartProvider = (props: any) => {
         )
       );
       toast.info("Product Quantity Updated!");
+      return true;
     } else {
       toast.error("Enter Valid Quantity!");
+      return false;
     }
   };
 
-  const removeFromCart = (item: { cartItemId: string }) => {
+  const removeFromCart = (item: CartItem): boolean => {
     toast.error("Product Removed from Cart Successfully!");
     setCartItems((prev) =>
       prev.filter((e) => e.cartItemId !== item.cartItemId)
     );
+    return true;
   };
 
   const emptyCart = () => {
@@ -79,6 +136,9 @@ export const CartProvider = (props: any) => {
         updateQty,
         removeFromCart,
         emptyCart,
+        isProductInCart,
+        getProductQuantity,
+        findCartItem,
       }}
     >
       {props.children}

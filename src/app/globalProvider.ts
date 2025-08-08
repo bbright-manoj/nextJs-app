@@ -1,10 +1,12 @@
 // ignore_for_file: depend_on_referenced_packages
 
+// import { userService } from './services/user.service';
+
 //library one_rpapp_service;
 
 //APP SETUP
-
-export * from '@/app_setup/app_bootstrap';
+export * from "@/app/config/index";
+export * from "@/app_setup/app_bootstrap";
 // export * from '@/app_setup/app_global';
 // export * from '@/app_setup/app_settings';
 // export * from '@/app_setup/human_id';
@@ -13,22 +15,17 @@ export * from '@/app_setup/app_bootstrap';
 
 // MODELS
 
-export * from '@/app/models/models';
+export * from "@/app/models/models";
 
 // PROVIDERS
-export * from '@/app/providers/all_providers';
-
-
-//export * from '@/app/providers/providers';
+export * from "@/app/providers/all_providers";
 
 // SERVICES
 
-export * from '@/app/services/global.services';
+export * from "@/app/services/global.services";
 
 //UTILS
-export * from '@/utils/logger';
-
-
+export * from "@/utils/logger";
 
 // DEPENDENCIES IMPORT
 // export 'package:flutter_live_data/live_data.dart';

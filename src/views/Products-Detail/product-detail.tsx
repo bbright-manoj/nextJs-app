@@ -8,8 +8,8 @@ import { CartContext } from "@/helpers/cart/cart.context";
 import { CurrencyContext } from "@/helpers/currency/CurrencyContext";
 import { WishlistContext } from "@/helpers/wishlist/wish.context";
 import ImageSwatch from "./common/ImageSwatch";
-import router, { useRouter } from "next/router";
 import { Discount, Product, searchController } from "@/app/globalProvider";
+
 interface ProductRightProps {
   item: Product | Discount;
   changeColorVar: Function | any;
@@ -17,7 +17,12 @@ interface ProductRightProps {
   swatch: boolean;
 }
 
-const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bundle, swatch }) => {
+const ProductDetail: React.FC<ProductRightProps> = ({
+  item,
+  changeColorVar,
+  bundle,
+  swatch,
+}) => {
   const [modal, setModal] = useState(false);
   const [qty, setQty] = useState(1);
   const [stock, setStock] = useState("InStock");
@@ -53,32 +58,63 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
       setStock("Out of Stock !");
     }
   };
+
   const changeQty = (e: any) => {
-    setQty(parseInt(e.target.value));
+    const newQty = parseInt(e.target.value);
+    if (newQty >= 1 && !isNaN(newQty)) {
+      setQty(newQty);
+      // Check stock availability
+      if (item.stock && newQty > item.stock) {
+        setStock("Out of Stock !");
+      } else {
+        setStock("InStock");
+      }
+    }
   };
-  // const { id } = router.query; 
-  
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+
+    // Check stock before adding
+    if (item.stock && qty > item.stock) {
+      setStock("Out of Stock !");
+      return;
+    }
+
+    // Add to cart with the selected quantity
+    addToCart(item, qty);
+  };
+
+  // const { id } = router.query;
+
   const uniqueColor: any[] = [];
   const uniqueSize: any[] = [];
   return (
     <div className="product-right contents">
       <div className="product-status">
         <span className="product-catagory">{item.categoryName}</span>
-        <div className="rating-stars-group">
-          <div className="rating-star"><i className="fas fa-star"></i></div>
-          <div className="rating-star"><i className="fas fa-star"></i></div>
-          <div className="rating-star"><i className="fas fa-star-half-alt"></i></div>
-          <span>10 Reviews</span>
+        <div className="d-flex align-items-center gap-2">
+          <ul className="rating-star m-2 p-0">
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star text-warning"></i>
+            <i className="fa fa-star-o text-warning"></i>
+          </ul>
         </div>
       </div>
       <h2>{item.name}</h2>
-      {item.discount ? <h4>
-        <del>
-          {symbol}
-          {item.getProductPrice() * value}
-        </del>
-        <span>{symbol}{item.getDiscountAmount()} off</span>
-      </h4> : ''}
+      {item.discount ? (
+        <h2>
+          <span className="text-danger me-3">-{item.getDiscount()}%</span>
+          <del className="text-muted ">
+            M.R.P:{symbol}
+            {item.getProductPrice() * value}
+          </del>
+        </h2>
+      ) : (
+        ""
+      )}
       <h3 className="product-price mb--15 d-block">
         {symbol}
         {(item.getPriceWithDiscount() * value).toFixed(2)}
@@ -90,7 +126,11 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
           var findItemSize = uniqueSize.find((x) => x === vari.size);
           if (!findItemSize && vari.size) uniqueSize.push(vari.size);
         })} */}
-      {swatch ? <ImageSwatch item={item} changeColorVar={changeColorVar} /> : ""}
+      {swatch ? (
+        <ImageSwatch item={item} changeColorVar={changeColorVar} />
+      ) : (
+        ""
+      )}
       {/* <div className="product-description border-product">
         <h6 className="product-title">select color</h6>
         {changeColorVar === undefined
@@ -149,39 +189,62 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
         )}
       </div> */}
       <div className="product-description border-product">
-        {stock !== "InStock" ? <span className="instock-cls">{stock}</span> : ""}
+        {stock !== "InStock" ? (
+          <span className="instock-cls">{stock}</span>
+        ) : (
+          ""
+        )}
         <h6 className="product-title">quantity</h6>
-        <div className="qty-box">
+      </div>
+      <div className="flex-block">
+        <div className="qty-box contents">
           <div className="input-group">
             <span className="input-group-prepend">
-              <button type="button" className="btn quantity-left-minus" data-type="minus" data-field="" onClick={minusQty}>
+              <button
+                type="button"
+                className="btn quantity-left-minus"
+                data-type="minus"
+                data-field=""
+                onClick={minusQty}
+              >
                 <i className="ti-angle-left"></i>
               </button>
             </span>
-            <Input type="text" name="quantity" className="form-control input-number" value={qty} onChange={changeQty} />
+            <Input
+              type="text"
+              name="quantity"
+              className="form-control input-number"
+              value={qty}
+              onChange={changeQty}
+            />
             <span className="input-group-prepend">
-              <button type="button" className="btn quantity-right-plus" data-type="plus" data-field="" onClick={plusQty}>
+              <button
+                type="button"
+                className="btn quantity-right-plus"
+                data-type="plus"
+                data-field=""
+                onClick={plusQty}
+              >
                 <i className="ti-angle-right"></i>
               </button>
             </span>
           </div>
         </div>
-      </div>
-      <div className="product-buttons">
-        <a
-          href="#"
-          data-toggle="modal"
-          data-target="#addtocart"
-          className="btn btn-normal"
-          onClick={(e) => {
-            e.preventDefault();
-            addToCart(item);
-          }}>
-          add to cart
-        </a>
-        <a href="/pages/account/checkout" className="btn btn-normal">
-          buy now
-        </a>
+
+        <div className="product-buttons">
+          <a
+            href="#"
+            data-toggle="modal"
+            data-target="#addtocart"
+            className="btn btn-normal"
+            onClick={handleAddToCart}
+          >
+            add to cart
+          </a>
+          <a href="/pages/account/checkout" className="btn btn-normal">
+            buy now
+          </a>
+        </div>
       </div>
       {/* <div className="border-product"> */}
       {/* <h6 className="product-title">product details</h6> */}
@@ -191,50 +254,44 @@ const ProductDetail: React.FC<ProductRightProps> = ({ item, changeColorVar, bund
       {/* </p> */}
       {/* </div> */}
       <div className="product-uniques">
-        <span className="sku product-unipue mb--10"><strong>SKU:</strong> BO1D0MX8SJ</span>
-        <span className="catagorys product-unipue mb--10"><strong>Categories:</strong> T-Shirts, Tops, Mens</span>
-        <span className="tags product-unipue mb--10"><strong>Tags:</strong> fashion, t-shirts, Men</span>
-        <span className="tags product-unipue mb--10"><strong>LIFE:</strong> 6 Months</span>
-        <span className="tags product-unipue mb--10"><strong>Type:</strong> original</span>
-        <span className="tags product-unipue mb--10"><strong>Category:</strong> Beverages, Dairy & Bakery</span>
+        {/* <span className="sku product-unipue mb--10"><strong>SKU:</strong> BO1D0MX8SJ</span> */}
+        {/* <span className="catagorys product-unipue mb--10">
+          <strong>Categories:</strong>
+        </span> */}
+        {item.tags.length ? (
+          <span className="tags product-unipue mb--10 ">
+            <strong>Tags:</strong>
+            {item.tags.join(", ")}
+          </span>
+        ) : (
+          ""
+        )}
+        <span className="tags product-unipue mb--10">
+          <strong>LIFE:</strong> 6 Months
+        </span>
+        <span className="tags product-unipue mb--10">
+          <strong>Type:</strong> original
+        </span>
+        {item.brandName ? (
+          <span className="tags product-unipue mb--10">
+            <strong>Brand Name: </strong>
+            {item.brandName}
+          </span>
+        ) : (
+          <></>
+        )}
       </div>
-      <div className="border-product">
+      <div className="border-product ">
         <div className="product-icon">
-          <ul className="product-social">
-            <li>
-              <a href="#">
-                <i className="fa fa-facebook"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-google-plus"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-twitter"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-instagram"></i>
-              </a>
-            </li>
-            <li>
-              <a href="#">
-                <i className="fa fa-rss"></i>
-              </a>
-            </li>
-          </ul>
-          <div className="d-inline-block">
+          <div className="d-inline-block ">
             <button
-              className="wishlist-btn"
+              className="wishlist-btn p-4 center"
               onClick={() => {
                 addToWish(item);
-              }}>
+              }}
+            >
               <i className="fa fa-heart"></i>
-              <span className="title-font">Add To WishList</span>
+              <span className="title-font ">Add To WishList</span>
             </button>
           </div>
         </div>

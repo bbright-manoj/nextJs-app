@@ -7,7 +7,7 @@ export * from './cart_object/cart_object';
 export * from './category/category';
 export * from './category_product/category_product';
 export * from './coupon/coupon';
-//export * from './coupon_assigned_users/coupon_assigned_users';
+// export * from './coupon_assigned_users/coupon_assigned_users';
 export * from './discount/discount';
 export * from './discount_item/discount_item';
 export * from './job/job';
@@ -33,7 +33,7 @@ export * from './store/store_base_details';
 export * from './store/store_contact_details';
 export * from './store/store_offer_ranges';
 export * from './store/store_price_ranges';
-export * from './sub_product/sub_product';
+
 export * from './success_order_items/success_order_items';
 export * from './tags/tags';
 export * from './tax_group_model/tax_group_model';

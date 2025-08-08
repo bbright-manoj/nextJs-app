@@ -19,6 +19,7 @@ export class Category {
   creationTime: string;
   category_products: CategoryProducts[];
 
+  
   constructor({
     img,
     name,
@@ -185,4 +186,3 @@ export class CategoryRender {
     );
   }
 }
-

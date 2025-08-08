@@ -9,7 +9,7 @@ import Breadcrumb from "../../Containers/Breadcrumb";
 import { CurrencyContext } from "@/helpers/currency/CurrencyContext";
 import { searchController } from "@/app/globalProvider";
 import { WishlistProduct } from "../../../helpers/wishlist/wishlistStore";
-import { Kit } from "@/app/models/kit/kit";
+//import { Kit } from "@/app/models/kit/kit";
 
 // Enhanced interface for enriched wishlist data
 interface EnrichedWishlistItem extends WishlistProduct {
@@ -25,7 +25,9 @@ const WishListPage: NextPage = () => {
   const { selectedCurr } = React.useContext(CurrencyContext);
   const { symbol, value } = selectedCurr;
 
-  const [enrichedWishlistData, setEnrichedWishlistData] = useState<EnrichedWishlistItem[]>([]);
+  const [enrichedWishlistData, setEnrichedWishlistData] = useState<
+    EnrichedWishlistItem[]
+  >([]);
 
   // ✅ Enhanced product lookup with multiple fallback strategies (same as cart)
   const getProductById = (productId: string): any => {
@@ -44,14 +46,18 @@ const WishListPage: NextPage = () => {
 
       // Search in kits array with proper null checks
       if (searchController?.kits && Array.isArray(searchController.kits)) {
-        const kitRaw = searchController.kits.find((k: any) => k?.id === productId);
+        const kitRaw = searchController.kits.find(
+          (k: any) => k?.id === productId
+        );
         if (kitRaw) {
           return kitRaw;
         }
       }
 
       // Try getDetails as fallback with required eventName parameter
-      const found = searchController?.getDetails ? searchController.getDetails(productId, 'wishlist') : null;
+      const found = searchController?.getDetails
+        ? searchController.getDetails(productId, "wishlist")
+        : null;
       if (found && typeof found === "object") {
         return found;
       }
@@ -65,47 +71,71 @@ const WishListPage: NextPage = () => {
   // ✅ Enhanced enrichment logic with robust product lookup
   useEffect(() => {
     const enrichedData = wishlistItems.map((item) => {
-      const found = getProductById(item.productId);
+      const found = item.productId ? getProductById(item.productId) : null;
 
       // Use fallback if product isn't found - consistent with cart logic
       const enriched = found && typeof found === "object" ? found : {};
 
       // Enhanced price extraction - same logic as cart
       const extractPriceFromObject = (obj: any): number => {
-        if (!obj || typeof obj !== 'object') return 0;
+        if (!obj || typeof obj !== "object") return 0;
 
         // Check standard price fields first
-        if ('price' in obj && typeof obj.price === 'number' && obj.price > 0) {
+        if ("price" in obj && typeof obj.price === "number" && obj.price > 0) {
           return obj.price;
         }
 
         // Check Kit-specific price fields
-        if ('kitPrice' in obj && typeof obj.kitPrice === 'number' && obj.kitPrice > 0) {
+        if (
+          "kitPrice" in obj &&
+          typeof obj.kitPrice === "number" &&
+          obj.kitPrice > 0
+        ) {
           return obj.kitPrice;
         }
 
         // Check for discount price (prioritize over original price)
-        if (obj.discountPrice && typeof obj.discountPrice === 'number' && obj.discountPrice > 0) {
+        if (
+          obj.discountPrice &&
+          typeof obj.discountPrice === "number" &&
+          obj.discountPrice > 0
+        ) {
           return obj.discountPrice;
         }
 
         // Check for sale price
-        if (obj.salePrice && typeof obj.salePrice === 'number' && obj.salePrice > 0) {
+        if (
+          obj.salePrice &&
+          typeof obj.salePrice === "number" &&
+          obj.salePrice > 0
+        ) {
           return obj.salePrice;
         }
 
         // Check for finalPrice
-        if (obj.finalPrice && typeof obj.finalPrice === 'number' && obj.finalPrice > 0) {
+        if (
+          obj.finalPrice &&
+          typeof obj.finalPrice === "number" &&
+          obj.finalPrice > 0
+        ) {
           return obj.finalPrice;
         }
 
         // Check for currentPrice
-        if (obj.currentPrice && typeof obj.currentPrice === 'number' && obj.currentPrice > 0) {
+        if (
+          obj.currentPrice &&
+          typeof obj.currentPrice === "number" &&
+          obj.currentPrice > 0
+        ) {
           return obj.currentPrice;
         }
 
         // Check for sellingPrice
-        if (obj.sellingPrice && typeof obj.sellingPrice === 'number' && obj.sellingPrice > 0) {
+        if (
+          obj.sellingPrice &&
+          typeof obj.sellingPrice === "number" &&
+          obj.sellingPrice > 0
+        ) {
           return obj.sellingPrice;
         }
 
@@ -113,11 +143,20 @@ const WishListPage: NextPage = () => {
       };
 
       // Extract price from found product or fallback to item price
-      const productPrice = extractPriceFromObject(enriched) || extractPriceFromObject(item) || item.price || 0;
+      const productPrice =
+        extractPriceFromObject(enriched) ||
+        extractPriceFromObject(item) ||
+        item.price ||
+        0;
 
       return {
         ...item,
-        title: enriched.title || enriched.name || item.title || item.name || "Unnamed Product",
+        title:
+          enriched.title ||
+          enriched.name ||
+          item.title ||
+          item.name ||
+          "Unnamed Product",
         img: enriched.img || enriched.images || item.img || [""],
         price: productPrice,
         stock: enriched.stock ?? enriched.quantity ?? item.stock ?? 0,
@@ -154,7 +193,9 @@ const WishListPage: NextPage = () => {
                     </thead>
                     <tbody>
                       {enrichedWishlistData.map((item, index) => (
-                        <tr key={`${item.productId}-${item.variantId ?? index}`}>
+                        <tr
+                          key={`${item.productId}-${item.variantId ?? index}`}
+                        >
                           <td>
                             <img
                               src={item.img?.[0] || ""}
@@ -168,7 +209,11 @@ const WishListPage: NextPage = () => {
                             {symbol}
                             {(item.price * value).toFixed(2)}
                           </td>
-                          <td>{(item.stock ?? 0) > 0 ? "In Stock" : "Out of Stock"}</td>
+                          <td>
+                            {(item.stock ?? 0) > 0
+                              ? "In Stock"
+                              : "Out of Stock"}
+                          </td>
                           <td>
                             <a
                               href="#"
@@ -199,10 +244,16 @@ const WishListPage: NextPage = () => {
               </Row>
               <Row className="wishlist-buttons">
                 <Col xs="12">
-                  <Link className="btn btn-normal" href="/collections/leftsidebar">
+                  <Link
+                    className="btn btn-normal"
+                    href="/collections/leftsidebar"
+                  >
                     continue shopping
                   </Link>
-                  <Link className="btn btn-normal" href="/pages/account/checkout">
+                  <Link
+                    className="btn btn-normal"
+                    href="/pages/account/checkout"
+                  >
                     check out
                   </Link>
                 </Col>
@@ -214,7 +265,7 @@ const WishListPage: NextPage = () => {
                 <Col sm="12" className="empty-cart-cls text-center">
                   <img
                     src="/images/empty-wishlist.png"
-                    className="img-fluid mb-4"
+                    className="mb-4"
                     alt="empty wishlist"
                   />
                   <h3>

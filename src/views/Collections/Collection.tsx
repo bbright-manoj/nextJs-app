@@ -10,8 +10,9 @@ import { FilterContext } from "../../helpers/filter/filter.context";
 import { WishlistContext } from "../../helpers/wishlist/wish.context";
 import ProductBox from "../layouts/widgets/Product-Box/productbox";
 import { useRouter, useSearchParams } from "next/navigation";
-import { objCache, searchController } from "@/app/globalProvider";
-import { Category, Discount, CategoryProducts } from "@/app/models/models";
+import { objCache, searchController ,Category, Discount, CategoryProducts} from "@/app/globalProvider";
+
+import CollectionBanner from "./CollectionBanner";
 
 type CollectionProps = {
   cols: any;
@@ -53,6 +54,19 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
       : searchController.getDetails(item.productId, "getPrice");
   };
 
+  // Function to handle adding item to cart with price included
+  const handleAddToCart = (item: any, qty = 1) => {
+    const price = (categoryType === "discount")
+      ? searchController.getDetails(item.id, "getPrice")
+      : searchController.getDetails(item.productId, "getPrice");
+    const cartItem = {
+      ...item,
+      price: price,
+      id: categoryType === "discount" ? item.id : item.productId,
+    };
+    addToCart(cartItem, qty);
+  };
+
   const handlePagination = () => {
     setIsLoading(true);
     setTimeout(() => {
@@ -65,10 +79,10 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
   useEffect(() => {
     if (categoryType === "category") {
       setProductData([...categoryProducts]);
-      console.log("\uD83D\uDFE2 Updated productData from categoryProducts:", categoryProducts);
     } else if (categoryType === "discount") {
       const found = objCache.discountList.find((item: Discount) => item.id === categoryId);
       if (found) {
+        setDiscount(found);
         setProductData(
           (found.discountItems || []).map((item: any) => ({
             ...item,
@@ -80,12 +94,13 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
       }
     }
   }, [categoryProducts, categoryType, categoryId]);
-
+  
   return (
     <Col className="collection-content">
       <div className="page-main-content">
         <Row>
-          <Col sm="12">
+          <Col sm="12">{categoryType === "discount"? <CollectionBanner img={discount?.img?.[0]} name={discount?.name} details={discount?.details} />:''}
+            
             <div className="collection-product-wrapper">
               {/* Product Grid */}
               <div className={`product-wrapper-grid ${layout}`}>
@@ -101,10 +116,11 @@ const Collection: NextPage<CollectionProps> = ({ cols, layoutList, categoryProdu
                           <ProductBox
                             layout="layout-one"
                             data={item}
+                            hoverEffect={'icon-inline'}
                             newLabel={item.new}
                             item={item}
                             price={getPrice(item)}
-                            addCart={() => addToCart(item)}
+                            addCart={handleAddToCart}
                             addCompare={() => addToCompare(item)}
                             addWish={() => addToWish(item)}
                           />

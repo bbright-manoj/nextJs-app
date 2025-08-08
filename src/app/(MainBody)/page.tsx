@@ -21,13 +21,19 @@ import SpecialProduct from "@/views/layouts/widgets/title-section";
 import DiscountProducts from "@/views/layouts/layout1/discounts";
 
 import { useEffect, useState } from "react";
-import { BannerModel, Category, CategoryProducts, Discount, Kit, ObjCache, Product, StorePriceRanges, objCache } from "../globalProvider";
-import { Subscription } from 'rxjs';
+import {
+  BannerModel,
+  Category,
+  Discount,
+  Kit,
+  Product,
+  StorePriceRanges,
+  ObjCache,
+  objCache,
+} from "../globalProvider";
+
 import Kits from "@/views/Kits/kits_list";
 import RecentlyAddedProducts from "@/views/Products-Detail/Recently-added/recently-added-products";
-
-
-
 
 //const centralDataCollectorObj: CentralDataCollector = centralDataCollector;
 
@@ -38,68 +44,46 @@ const Home = () => {
   const [allCategories, setAllCategories] = useState<Array<Category>>();
   const [categoryProducts, setcategoryProducts] = useState<Array<Product>>([]);
   const [banners, setBanners] = useState<Array<BannerModel>>();
-  const [priceRanges, setPriceRanges] = useState<StorePriceRanges>();
+  const [priceRanges, setPriceRanges] = useState<StorePriceRanges>(
+    StorePriceRanges.emptyPriceRanges()
+  );
   useEffect(() => {
     // Subscribe to the Subject
-    objCache.on('update', () => {
+    objCache.on("update", () => {
       setKits(objCache.kitList);
       setProducts(objCache.discountList);
       setBanners(objCache.allBannersList);
       setCategories(objCache.categories);
       setAllCategories(objCache.allCategories);
       setcategoryProducts(objCache.allProducstsList);
-      
-       //setPriceRanges(objCache.priceRanges);
+      setPriceRanges(objCache.priceRanges);
+    });
 
-    })
-    
-    objCache.on('UpdatePriceRanges',(priceRanges: StorePriceRanges) => {
-      setPriceRanges(priceRanges)
-    })
+    objCache.on("UpdatePriceRanges", (priceRanges: StorePriceRanges) => {
+      setPriceRanges(priceRanges);
+    });
   }, []);
 
   return (
     <>
       {/* <NewsLatter /> */}
       <Layouts>
-       
-          <SliderBanner banners={banners} />
-          <CollectionBanner categories={categories} categoryProducts={categoryProducts}/>
-          <TabProduct effect="icon-inline" categories={allCategories} />
-          {/* <CategoryProducts effect="icon-inline" categories={allCategories} /> */}
-          {/* <DiscountBanner /> */}
+        <SliderBanner banners={banners} />
+        <CollectionBanner
+          categories={categories}
+          categoryProducts={categoryProducts}
+        />
+        <TabProduct effect="icon-inline" categories={allCategories} />
 
-          {/* <CollectionBannerTwo /> */}
-          <DiscountProducts products={products} />
+        <DiscountProducts products={products} />
 
-          <RecentlyAddedProducts/>
+        <RecentlyAddedProducts />
 
-          <Kits kits={kits} />
+        <Kits kits={kits} />
 
-          {/* <DiscountBanner /> */}
-
-          {/* <CollectionBannerTwo />
-            <section className="deal-banner">
-              <DealBanner />
-            </section>
-            <section className="rounded-category">
-              <Category_View />
-            </section> */}
-          <section className="box-category section-py-space" >
-            <PriceRanges priceRanges={priceRanges} />
-          </section>
-          {/* <RatioSquare />
-            <CollectionBannerThree />
-            <HotDeal />
-            <section className="testimonial testimonial-inverse">
-              <Testimonial />
-            </section>
-            <SpecialProduct hoverEffect="icon-inline" />
-            <section className="instagram">
-              <InstagramSection />
-            </section>
-            <ContactBanner /> */}
-      
+        <section className="box-category section-py-space">
+          <PriceRanges priceRanges={priceRanges} />
+        </section>
       </Layouts>
     </>
   );
